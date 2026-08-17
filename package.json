@@ -1,0 +1,8 @@
+{
+  "name": "triviani-detective",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

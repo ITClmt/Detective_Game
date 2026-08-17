@@ -1,5 +1,6 @@
 {
-  "name": "triviani-detective",
+  "name": "api",
+  "private": true,
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },
