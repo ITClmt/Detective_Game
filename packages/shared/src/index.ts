@@ -1,1 +1,1 @@
-export type Placeholder = never;
+export * from "./schemas/auth.schema";
