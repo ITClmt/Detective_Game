@@ -1,10 +1,10 @@
-import { Pool } from 'pg'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { env } from '../env'
-import { relations } from './relations'
+import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { env } from "../env";
+import { relations } from "./relations";
 
 export const pool = new Pool({
-  connectionString: env.DATABASE_URL,
-})
+	connectionString: env.DATABASE_URL,
+});
 
-export const db = drizzle({ client: pool, relations })
+export const db = drizzle({ client: pool, relations });
