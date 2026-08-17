@@ -1,5 +1,12 @@
-# deps
+# deps (root + per-workspace)
 node_modules/
 
 # env
 .env
+.env.*.local
+
+# logs
+*.log
+
+# OS
+.DS_Store
