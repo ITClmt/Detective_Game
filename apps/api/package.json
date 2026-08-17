@@ -5,6 +5,7 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@repo/shared": "workspace:*",
     "@hono/zod-validator": "^0.9.0",
     "drizzle-orm": "^1.0.0-rc.4",
     "hono": "^4.13.2",

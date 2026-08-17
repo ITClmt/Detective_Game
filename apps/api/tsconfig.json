@@ -1,8 +1,13 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
     "types": ["bun"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@repo/shared": ["../../packages/shared/src/index.ts"],
+      "@repo/shared/*": ["../../packages/shared/src/*"]
+    }
   }
 }
