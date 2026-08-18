@@ -1,9 +1,9 @@
-import { integer, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { usersTable } from "./users";
 
 export const refreshTokensTable = pgTable("refresh_tokens", {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	user_id: integer()
+	id: uuid().primaryKey().defaultRandom(),
+	user_id: uuid()
 		.notNull()
 		.references(() => usersTable.id, { onDelete: "cascade" }),
 	token_hash: varchar().notNull().unique(),
