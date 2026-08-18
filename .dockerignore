@@ -1,0 +1,9 @@
+node_modules
+**/node_modules
+.git
+
+# secrets: never bake real env files into an image layer
+.env
+**/.env
+
+apps/web
