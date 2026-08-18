@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
+import { env } from "./env";
 import router from "./router";
 
 const app = new Hono();
@@ -12,16 +13,16 @@ app.use("*", logger());
 // Middleware pour sécuriser les en-têtes HTTP
 app.use("*", secureHeaders());
 
-// Middleware pour gérer le CORS
+// Middleware pour gérer le CORS.
 app.use(
 	"*",
 	cors({
-		origin: "*",
+		origin: env.FRONTEND_URL,
 		credentials: true,
 	}),
 );
 
-app.route("api/v1", router);
+app.route("/api/v1", router);
 
 app.get("/ping", (c) => {
 	return c.json({
