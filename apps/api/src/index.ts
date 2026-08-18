@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { env } from "./env";
+import { AppError } from "./lib/errors";
 import router from "./router";
 
 const app = new Hono();
@@ -29,6 +30,29 @@ app.get("/ping", (c) => {
 		ok: true,
 		message: "pong!",
 	});
+});
+
+// Handler global : seules les AppError exposent leur message au client,
+// le reste est loggé côté serveur et renvoyé en 500 anonyme.
+app.onError((err, c) => {
+	if (err instanceof AppError) {
+		return c.json(
+			{ error: { code: err.code, message: err.message } },
+			err.status,
+		);
+	}
+
+	console.error(err);
+
+	return c.json(
+		{
+			error: {
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Une erreur est survenue",
+			},
+		},
+		500,
+	);
 });
 
 export default app;
