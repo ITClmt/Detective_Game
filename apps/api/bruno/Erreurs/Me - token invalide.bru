@@ -1,0 +1,30 @@
+meta {
+  name: Me - token invalide
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWtlIn0.signature-bidon
+}
+
+docs {
+  Signature falsifiée : la vérification HS256 doit échouer avant même
+  de toucher à la base.
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code INVALID_ACCESS_TOKEN", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_ACCESS_TOKEN");
+  });
+}

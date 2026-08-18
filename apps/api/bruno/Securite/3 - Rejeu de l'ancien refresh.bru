@@ -1,0 +1,39 @@
+meta {
+  name: 3 - Rejeu de l'ancien refresh
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+docs {
+  Un token déjà révoqué qui revient = quelqu'un rejoue un cookie volé.
+  L'API refuse ET coupe toutes les sessions de l'utilisateur.
+
+  Note Bruno : un header `Cookie` écrit à la main ne suffit pas, Bruno fusionne
+  le cookie jar par-dessus et le jar gagne. Pour simuler le vol il faut donc
+  réécrire le jar lui-même.
+}
+
+script:pre-request {
+  const jar = bru.cookies.jar();
+  await jar.setCookie(
+    "{{baseUrl}}/auth/refresh",
+    "refresh_token",
+    bru.getVar("stolenRefreshToken")
+  );
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code INVALID_REFRESH_TOKEN", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_REFRESH_TOKEN");
+  });
+}

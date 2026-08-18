@@ -1,0 +1,37 @@
+meta {
+  name: Login - email inconnu
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "personne@test.dev",
+    "password": "{{password}}"
+  }
+}
+
+docs {
+  Doit renvoyer exactement la même erreur qu'un mauvais mot de passe : sinon
+  l'API laisse deviner quels emails sont enregistrés.
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("erreur indiscernable d'un mauvais mot de passe", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_CREDENTIALS");
+  });
+}

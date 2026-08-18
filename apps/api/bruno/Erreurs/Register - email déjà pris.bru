@@ -1,0 +1,33 @@
+meta {
+  name: Register - email déjà pris
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "doublon",
+    "email": "{{testEmail}}",
+    "password": "{{password}}"
+  }
+}
+
+tests {
+  test("répond 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+
+  test("code ERROR_REGISTER", function () {
+    expect(res.getBody().error.code).to.equal("ERROR_REGISTER");
+  });
+}

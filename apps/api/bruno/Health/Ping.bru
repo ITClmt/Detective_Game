@@ -1,0 +1,21 @@
+meta {
+  name: Ping
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/ping
+  body: none
+  auth: none
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("l'API est debout", function () {
+    expect(res.getBody().message).to.equal("pong!");
+  });
+}

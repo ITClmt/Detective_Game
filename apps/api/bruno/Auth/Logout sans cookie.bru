@@ -1,0 +1,21 @@
+meta {
+  name: Logout sans cookie
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: none
+  auth: none
+}
+
+docs {
+  Le logout est idempotent : l'appeler sans session valide n'est pas une erreur.
+}
+
+tests {
+  test("répond 204 quand même", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

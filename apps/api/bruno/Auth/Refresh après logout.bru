@@ -1,0 +1,26 @@
+meta {
+  name: Refresh après logout
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+docs {
+  Le refresh a été révoqué en base par le logout : même si le client rejoue
+  le cookie, la session est morte.
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code d'erreur explicite", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_REFRESH_TOKEN");
+  });
+}

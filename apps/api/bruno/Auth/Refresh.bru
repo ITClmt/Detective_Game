@@ -1,0 +1,41 @@
+meta {
+  name: Refresh
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+docs {
+  On ne teste pas que l'access token diffère du précédent : le payload est
+  {sub, role, exp} et exp est en secondes, donc deux tokens émis dans la même
+  seconde sont légitimement identiques. Ce qui doit changer, c'est le refresh.
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    bru.setVar("accessToken", res.getBody().accessToken);
+  }
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("émet un access token bien formé", function () {
+    const token = res.getBody().accessToken;
+    expect(token).to.be.a("string");
+    expect(token.split(".")).to.have.lengthOf(3);
+    expect(res.getBody().expiresIn).to.be.a("number");
+  });
+
+  test("fait tourner le refresh (rotation)", function () {
+    const raw = String(res.getHeader("set-cookie"));
+    expect(raw).to.include("refresh_token=");
+  });
+}

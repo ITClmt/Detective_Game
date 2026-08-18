@@ -1,0 +1,32 @@
+meta {
+  name: Login - mauvais mot de passe
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "{{testEmail}}",
+    "password": "Wrong1e!"
+  }
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code INVALID_CREDENTIALS", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_CREDENTIALS");
+  });
+}

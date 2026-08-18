@@ -1,0 +1,21 @@
+meta {
+  name: Refresh - sans cookie
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code INVALID_REFRESH_TOKEN", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_REFRESH_TOKEN");
+  });
+}

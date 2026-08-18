@@ -1,0 +1,33 @@
+meta {
+  name: 2 - Rotation
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+docs {
+  Rotation normale : le token capturé à l'étape 1 vient d'être révoqué
+  et remplacé. Le client légitime détient désormais le nouveau.
+}
+
+script:post-response {
+  const header = res.getHeader("set-cookie");
+  const raw = Array.isArray(header) ? header.join(";") : String(header);
+  const match = /refresh_token=([^;]+)/.exec(raw);
+  bru.setVar("currentRefreshToken", match ? match[1] : "");
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("le refresh a changé", function () {
+    expect(bru.getVar("currentRefreshToken")).to.not.equal(bru.getVar("stolenRefreshToken"));
+  });
+}

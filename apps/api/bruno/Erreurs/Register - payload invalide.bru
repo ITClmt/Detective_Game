@@ -1,0 +1,54 @@
+meta {
+  name: Register - payload invalide
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "ab",
+    "email": "pas-un-email",
+    "password": "faible"
+  }
+}
+
+docs {
+  Username trop court, email malformé, mot de passe sans majuscule ni chiffre
+  ni caractère spécial.
+
+  Les erreurs de validation doivent sortir dans la MÊME enveloppe que les
+  erreurs métier : sans le hook passé à zValidator, Hono répondrait
+  { success: false, error: <ZodError> } en court-circuitant app.onError.
+}
+
+tests {
+  test("répond 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("même enveloppe que les erreurs métier", function () {
+    expect(res.getBody()).to.have.property("error");
+    expect(res.getBody().error).to.have.property("code");
+    expect(res.getBody().error).to.have.property("message");
+  });
+
+  test("code VALIDATION_ERROR", function () {
+    expect(res.getBody().error.code).to.equal("VALIDATION_ERROR");
+  });
+
+  test("n'expose pas la structure interne de Zod", function () {
+    expect(res.getBody()).to.not.have.property("success");
+    expect(res.getBody().error).to.not.have.property("issues");
+    expect(res.getBody().error).to.not.have.property("name");
+  });
+}

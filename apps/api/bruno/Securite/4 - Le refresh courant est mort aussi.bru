@@ -1,0 +1,37 @@
+meta {
+  name: 4 - Le refresh courant est mort aussi
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: none
+  auth: none
+}
+
+docs {
+  C'est le cœur de la détection de rejeu : le token légitime obtenu à
+  l'étape 2 est lui aussi révoqué. Le vrai utilisateur est déconnecté,
+  et le voleur n'a rien gagné.
+}
+
+script:pre-request {
+  // On remet dans le jar le token légitime, que l'étape 3 vient d'écraser.
+  const jar = bru.cookies.jar();
+  await jar.setCookie(
+    "{{baseUrl}}/auth/refresh",
+    "refresh_token",
+    bru.getVar("currentRefreshToken")
+  );
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("révocation en cascade effective", function () {
+    expect(res.getBody().error.code).to.equal("INVALID_REFRESH_TOKEN");
+  });
+}

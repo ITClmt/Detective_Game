@@ -1,0 +1,72 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "{{testUsername}}",
+    "email": "{{testEmail}}",
+    "password": "{{password}}"
+  }
+}
+
+script:pre-request {
+  // Un compte neuf à chaque exécution : la collection reste rejouable
+  // sans avoir à vider la base entre deux runs.
+  const suffix = Date.now();
+  bru.setVar("testUsername", "sherlock" + suffix);
+  bru.setVar("testEmail", "sherlock+" + suffix + "@test.dev");
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    bru.setVar("accessToken", res.getBody().accessToken);
+    bru.setVar("userId", res.getBody().user.id);
+  }
+}
+
+tests {
+  test("répond 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("renvoie un access token et l'utilisateur", function () {
+    expect(res.getBody().accessToken).to.be.a("string");
+    expect(res.getBody().expiresIn).to.be.a("number");
+    expect(res.getBody().user.email).to.equal(bru.getVar("testEmail"));
+    expect(res.getBody().user.role).to.equal("player");
+  });
+
+  test("l'id est un uuid", function () {
+    expect(res.getBody().user.id).to.match(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+  });
+
+  test("ne fuite jamais le mot de passe", function () {
+    expect(res.getBody().user).to.not.have.property("password");
+  });
+
+  test("pose le refresh en cookie httpOnly scopé sur /auth", function () {
+    const raw = String(res.getHeader("set-cookie"));
+    expect(raw).to.include("refresh_token=");
+    expect(raw).to.include("HttpOnly");
+    expect(raw).to.include("Path=/api/v1/auth");
+  });
+
+  test("le refresh ne transite pas dans le body", function () {
+    expect(res.getBody()).to.not.have.property("refreshToken");
+  });
+}

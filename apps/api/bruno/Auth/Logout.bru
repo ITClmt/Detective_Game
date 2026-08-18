@@ -1,0 +1,23 @@
+meta {
+  name: Logout
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: none
+  auth: none
+}
+
+tests {
+  test("répond 204 sans corps", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+
+  test("efface le cookie de refresh", function () {
+    const raw = String(res.getHeader("set-cookie"));
+    expect(raw).to.include("refresh_token=;");
+    expect(raw).to.include("Max-Age=0");
+  });
+}

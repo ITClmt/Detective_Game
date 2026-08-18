@@ -1,0 +1,41 @@
+meta {
+  name: 1 - Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "{{testEmail}}",
+    "password": "{{password}}"
+  }
+}
+
+script:post-response {
+  // On garde la valeur du refresh pour simuler plus loin un cookie volé.
+  const header = res.getHeader("set-cookie");
+  const raw = Array.isArray(header) ? header.join(";") : String(header);
+  const match = /refresh_token=([^;]+)/.exec(raw);
+  bru.setVar("stolenRefreshToken", match ? match[1] : "");
+  bru.setVar("accessToken", res.getBody().accessToken);
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("le refresh a bien été capturé", function () {
+    expect(bru.getVar("stolenRefreshToken")).to.have.length.above(20);
+  });
+}
