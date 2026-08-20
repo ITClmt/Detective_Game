@@ -6,7 +6,8 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!apps/api/drizzle", "!apps/api/bruno"]
 	},
 	"formatter": {
 		"enabled": true,
