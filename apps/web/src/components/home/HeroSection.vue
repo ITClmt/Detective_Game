@@ -28,7 +28,7 @@
 			</p>
 
 			<p class="mb-11 font-mono text-meta tracking-cta text-content-subtle">
-				Jeu d'enquête point-and-click — jouable dans le navigateur.
+				Jeu d'enquête point-and-click - jouable dans le navigateur.
 			</p>
 
 			<RouterLink
