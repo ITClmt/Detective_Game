@@ -23,6 +23,13 @@ USER bun
 
 EXPOSE 3000
 
+# Les migrations en attente sont appliquées au démarrage, avant que l'API
+# n'accepte la moindre requête. Le conteneur ne démarre pas si elles échouent.
+#
+# Tenable tant qu'une seule instance tourne. Le jour où plusieurs répliques
+# démarrent en parallèle, elles se disputeront la table de migrations : il
+# faudra sortir l'étape du CMD et en faire un job de déploiement distinct.
+#
 # Pas de --hot ici : c'est un watcher de développement, et les sources sont
 # de toute façon figées dans l'image au moment du build.
-CMD ["bun", "run", "src/index.ts"]
+CMD ["sh", "-c", "bun run src/db/migrate.ts && bun run src/index.ts"]
