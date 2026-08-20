@@ -1,0 +1,17 @@
+# build
+dist
+dist-ssr
+coverage
+*.tsbuildinfo
+
+# env locaux (le .env est déjà ignoré à la racine)
+*.local
+
+# éditeurs
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Vitest / Vite
+__screenshots__/
+*.timestamp-*-*.mjs
