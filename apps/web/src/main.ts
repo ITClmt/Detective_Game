@@ -1,3 +1,8 @@
+import "@fontsource/ibm-plex-mono";
+import "@fontsource/ibm-plex-sans";
+import "@fontsource/zilla-slab";
+import "./assets/main.css";
+
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 

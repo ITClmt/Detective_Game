@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #0A0E13; color: #E7ECF2; }
+  a { color: #E3B563; text-decoration: none; }
+  a:hover { color: #F2CD8A; }
+  @keyframes hotspot { 0%,100% { transform: scale(1); opacity: .85 } 50% { transform: scale(1.35); opacity: .35 } }
+  @keyframes flick { 0%,100% { opacity: .5 } 47% { opacity: .5 } 50% { opacity: .34 } 53% { opacity: .5 } }
+</style>
+</helmet>
+
+<div style="background:#0A0E13;color:#E7ECF2;font-family:'IBM Plex Sans',system-ui,sans-serif;overflow-x:hidden">
+
+  <sc-if value="{{ heroSplit }}" hint-placeholder-val="{{ false }}">
+    <section style="position:relative;min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:64px;padding:72px 64px;box-sizing:border-box;background:#0A0E13">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 12% 8%, rgba(227,181,99,.13), transparent 55%);pointer-events:none"></div>
+      <div style="position:absolute;inset:0;box-shadow:inset 0 0 220px 90px rgba(0,0,0,.85);pointer-events:none"></div>
+
+      <div style="position:relative;max-width:620px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:34px">
+          <span style="width:34px;height:1px;background:#E3B563"></span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.22em;color:#E3B563">AFFAIRE N° 047 — EN COURS</span>
+        </div>
+        <h1 style="font-family:'Zilla Slab',serif;font-weight:700;font-size:96px;line-height:.92;letter-spacing:-.02em;margin:0 0 28px">NOIR<br />CASE</h1>
+        <p style="font-size:20px;line-height:1.65;color:#B6C2D0;margin:0 0 12px;max-width:46ch;text-wrap:pretty">Incarnez un détective privé. Explorez les lieux, interrogez les suspects, résolvez l'enquête.</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.7;color:#7D8A98;margin:0 0 40px">Jeu d'enquête point-and-click. Aucun téléchargement.</p>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <a href="Auth.dc.html" style="display:inline-flex;align-items:center;gap:12px;background:#E3B563;color:#0A0E13;font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:15px;letter-spacing:.04em;padding:17px 30px;border:1px solid #E3B563" style-hover="background:#F2CD8A;border-color:#F2CD8A">COMMENCER L'ENQUÊTE
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px">→</span>
+          </a>
+          <a href="#concept" style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.14em;color:#93A1B0;border-bottom:1px solid #24303C;padding-bottom:4px" style-hover="color:#E7ECF2;border-color:#E3B563">LE CONCEPT</a>
+        </div>
+      </div>
+
+      <div style="position:relative;border:1px solid #24303C;background:#111821;padding:22px;box-shadow:0 40px 90px -30px rgba(0,0,0,.9)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #24303C;padding-bottom:14px;margin-bottom:18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;color:#7D8A98">
+          <span>PIÈCE À CONVICTION</span>
+          <span style="color:#E3B563">01 / 04</span>
+        </div>
+        <div style="position:relative;aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#151D26 0 10px,#111821 10px 20px);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5F6C7A;letter-spacing:.1em;text-align:center;padding:0 24px">photo du lieu —<br />bureau du détective, nuit</span>
+          <span style="position:absolute;top:28%;left:24%;width:12px;height:12px;border-radius:50%;background:#E3B563;box-shadow:0 0 0 6px rgba(227,181,99,.16);animation:hotspot 2.6s ease-in-out infinite"></span>
+          <span style="position:absolute;top:64%;left:68%;width:12px;height:12px;border-radius:50%;background:#E3B563;box-shadow:0 0 0 6px rgba(227,181,99,.16);animation:hotspot 2.6s ease-in-out .9s infinite"></span>
+        </div>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;color:#93A1B0;margin:18px 0 0">&gt; Le tiroir est fermé. La serrure a été forcée récemment.</p>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ heroCentered }}" hint-placeholder-val="{{ true }}">
+    <section style="position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 32px;box-sizing:border-box;background:#0A0E13">
+      <div style="position:absolute;inset:0;background:radial-gradient(75% 55% at 50% 22%, rgba(227,181,99,.16), transparent 60%);pointer-events:none;animation:flick 7s ease-in-out infinite"></div>
+      <div style="position:absolute;inset:0;box-shadow:inset 0 0 260px 110px rgba(0,0,0,.9);pointer-events:none"></div>
+
+      <div style="position:relative;max-width:900px">
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:40px">
+          <span style="width:40px;height:1px;background:#24303C"></span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.24em;color:#E3B563">AFFAIRE N° 047 — EN COURS</span>
+          <span style="width:40px;height:1px;background:#24303C"></span>
+        </div>
+        <h1 style="font-family:'Zilla Slab',serif;font-weight:700;font-size:132px;line-height:.9;letter-spacing:-.03em;margin:0 0 30px">NOIR CASE</h1>
+        <p style="font-size:22px;line-height:1.6;color:#B6C2D0;margin:0 auto 14px;max-width:36ch;text-wrap:pretty">Incarnez un détective privé. Explorez les lieux, interrogez les suspects, résolvez l'enquête.</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#7D8A98;margin:0 0 46px;letter-spacing:.06em">Jeu d'enquête point-and-click — jouable dans le navigateur.</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap">
+          <a href="Auth.dc.html" style="display:inline-flex;align-items:center;gap:12px;background:#E3B563;color:#0A0E13;font-weight:600;font-size:15px;letter-spacing:.04em;padding:18px 34px;border:1px solid #E3B563" style-hover="background:#F2CD8A;border-color:#F2CD8A">COMMENCER L'ENQUÊTE
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:13px">→</span>
+          </a>
+          <a href="#concept" style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.14em;color:#93A1B0;border-bottom:1px solid #24303C;padding-bottom:4px" style-hover="color:#E7ECF2;border-color:#E3B563">LE CONCEPT</a>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#4E5B69">↓ FAITES DÉFILER</div>
+    </section>
+  </sc-if>
+
+  <section id="concept" style="border-top:1px solid #1A232D;background:#0C1117;padding:120px 64px">
+    <div style="max-width:1180px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:52px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.22em;color:#E3B563">01 — LE CONCEPT</span>
+        <span style="flex:1;height:1px;background:#1A232D"></span>
+      </div>
+      <h2 style="font-family:'Zilla Slab',serif;font-weight:600;font-size:46px;line-height:1.15;letter-spacing:-.01em;margin:0 0 24px;max-width:24ch">Une affaire se résout par la déduction, pas par le hasard.</h2>
+      <p style="font-size:18px;line-height:1.7;color:#93A1B0;margin:0 0 72px;max-width:62ch;text-wrap:pretty">Chaque enquête est un ensemble fermé : un lieu, des témoins, des indices matériels. Tout ce qu'il faut pour conclure est là. À vous de relier les éléments.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1A232D;border:1px solid #1A232D">
+        <div style="background:#111821;padding:38px 32px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#E3B563;margin-bottom:22px">QUI</div>
+          <h3 style="font-family:'Zilla Slab',serif;font-weight:600;font-size:23px;margin:0 0 14px;line-height:1.3">Explorer les lieux</h3>
+          <p style="font-size:15px;line-height:1.7;color:#93A1B0;margin:0">Des scènes fixes, fouillées au clic. Objets déplaçables, tiroirs fermés, détails qui n'ont rien à faire là.</p>
+        </div>
+        <div style="background:#111821;padding:38px 32px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#E3B563;margin-bottom:22px">POURQUOI</div>
+          <h3 style="font-family:'Zilla Slab',serif;font-weight:600;font-size:23px;margin:0 0 14px;line-height:1.3">Interroger les suspects</h3>
+          <p style="font-size:15px;line-height:1.7;color:#93A1B0;margin:0">Les questions disponibles dépendent de ce que vous avez trouvé. Confrontez un témoin à une preuve, son récit change.</p>
+        </div>
+        <div style="background:#111821;padding:38px 32px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#E3B563;margin-bottom:22px">COMMENT</div>
+          <h3 style="font-family:'Zilla Slab',serif;font-weight:600;font-size:23px;margin:0 0 14px;line-height:1.3">Résoudre par déduction</h3>
+          <p style="font-size:15px;line-height:1.7;color:#93A1B0;margin:0">Nommez le coupable, le mobile et la méthode. Une accusation sans preuve reste une accusation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid #1A232D;background:#0A0E13;padding:120px 64px">
+    <div style="max-width:1180px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:52px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.22em;color:#E3B563">02 — COMMENT ÇA MARCHE</span>
+        <span style="flex:1;height:1px;background:#1A232D"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:44px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #24303C;padding-bottom:18px;margin-bottom:22px">
+            <span style="font-family:'Zilla Slab',serif;font-weight:700;font-size:56px;line-height:1;color:#1F2A36">01</span>
+            <span style="font-family:'Zilla Slab',serif;font-weight:600;font-size:26px;color:#E7ECF2">Explorer</span>
+          </div>
+          <p style="font-size:16px;line-height:1.75;color:#93A1B0;margin:0">Balayez la scène. Cliquez sur les points d'interaction pour examiner, ouvrir, déplacer. Les indices rejoignent votre dossier.</p>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #24303C;padding-bottom:18px;margin-bottom:22px">
+            <span style="font-family:'Zilla Slab',serif;font-weight:700;font-size:56px;line-height:1;color:#1F2A36">02</span>
+            <span style="font-family:'Zilla Slab',serif;font-weight:600;font-size:26px;color:#E7ECF2">Interroger</span>
+          </div>
+          <p style="font-size:16px;line-height:1.75;color:#93A1B0;margin:0">Menez les entretiens. Chaque indice ouvre de nouvelles questions — et referme les échappatoires.</p>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #24303C;padding-bottom:18px;margin-bottom:22px">
+            <span style="font-family:'Zilla Slab',serif;font-weight:700;font-size:56px;line-height:1;color:#1F2A36">03</span>
+            <span style="font-family:'Zilla Slab',serif;font-weight:600;font-size:26px;color:#E7ECF2">Résoudre</span>
+          </div>
+          <p style="font-size:16px;line-height:1.75;color:#93A1B0;margin:0">Déposez vos conclusions : le coupable, le mobile, la méthode. L'affaire est classée — ou rouverte.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid #1A232D;background:#0C1117;padding:120px 64px">
+    <div style="max-width:1180px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:52px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.22em;color:#E3B563">03 — APERÇU</span>
+        <span style="flex:1;height:1px;background:#1A232D"></span>
+      </div>
+      <div style="position:relative;border:1px solid #24303C;background:#0A0E13;padding:14px;box-shadow:0 60px 120px -40px rgba(0,0,0,.95)">
+        <div style="position:relative;aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#151D26 0 12px,#111821 12px 24px);display:flex;align-items:center;justify-content:center;overflow:hidden">
+          <div style="position:absolute;inset:0;box-shadow:inset 0 0 180px 60px rgba(0,0,0,.7);pointer-events:none"></div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5F6C7A;letter-spacing:.1em;text-align:center">image du lieu — bureau du détective, nuit</span>
+
+          <span style="position:absolute;top:32%;left:19%;width:14px;height:14px;border-radius:50%;background:#E3B563;box-shadow:0 0 0 8px rgba(227,181,99,.14);animation:hotspot 2.8s ease-in-out infinite"></span>
+          <span style="position:absolute;top:58%;left:44%;width:14px;height:14px;border-radius:50%;background:#E3B563;box-shadow:0 0 0 8px rgba(227,181,99,.14);animation:hotspot 2.8s ease-in-out .7s infinite"></span>
+          <span style="position:absolute;top:24%;left:76%;width:14px;height:14px;border-radius:50%;background:#E3B563;box-shadow:0 0 0 8px rgba(227,181,99,.14);animation:hotspot 2.8s ease-in-out 1.4s infinite"></span>
+
+          <div style="position:absolute;top:26%;left:23%;display:flex;align-items:center;gap:10px;background:rgba(10,14,19,.92);border:1px solid #E3B563;padding:7px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#E3B563;white-space:nowrap">TIROIR FORCÉ</div>
+
+          <div style="position:absolute;left:32px;right:32px;bottom:28px;display:flex;gap:0;border:1px solid #24303C;background:rgba(12,17,23,.96);backdrop-filter:blur(2px)">
+            <div style="flex:1;padding:20px 24px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#E3B563;margin-bottom:10px">MME VALADIER — TÉMOIN</div>
+              <p style="font-size:16px;line-height:1.6;color:#E7ECF2;margin:0">« Je n'ai rien entendu cette nuit-là. Le bureau était fermé, comme toujours. »</p>
+            </div>
+            <div style="width:1px;background:#24303C"></div>
+            <div style="width:230px;padding:20px 22px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#5F6C7A">RÉPONDRE</div>
+              <div style="font-size:13px;color:#B6C2D0;border-left:2px solid #E3B563;padding-left:10px;line-height:1.5">Montrer la clé pliée</div>
+              <div style="font-size:13px;color:#7D8A98;border-left:2px solid #24303C;padding-left:10px;line-height:1.5">Insister sur l'heure</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 6px 4px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#5F6C7A">
+          <span>LIEU : BUREAU — 23:40</span>
+          <span>INDICES 4 / 9</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid #1A232D;background:#0A0E13;padding:56px 64px">
+    <div style="max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap">
+      <div>
+        <div style="font-family:'Zilla Slab',serif;font-weight:700;font-size:20px;letter-spacing:.02em;margin-bottom:10px">NOIR CASE</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5F6C7A">© 2026 — Tous droits réservés</div>
+      </div>
+      <div style="display:flex;gap:36px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em">
+        <a href="Auth.dc.html" style="color:#93A1B0" style-hover="color:#E3B563">SE CONNECTER</a>
+        <a href="#concept" style="color:#93A1B0" style-hover="color:#E3B563">LE JEU</a>
+        <a href="#" style="color:#93A1B0" style-hover="color:#E3B563">MENTIONS LÉGALES</a>
+        <a href="#" style="color:#93A1B0" style-hover="color:#E3B563">CONFIDENTIALITÉ</a>
+        <a href="#" style="color:#93A1B0" style-hover="color:#E3B563">CONTACT</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroVariant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;centered&quot;,&quot;split&quot;],&quot;default&quot;:&quot;centered&quot;,&quot;tsType&quot;:&quot;'centered' | 'split'&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const v = this.props.heroVariant ?? "centered";
+    return { heroCentered: v === "centered", heroSplit: v === "split" };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@theme {
+	/* ---- Surfaces ---- */
+	--color-surface: #0a0e13;
+	--color-surface-alt: #0c1117;
+	--color-surface-raised: #111821;
+	--color-surface-inset: #0d141b;
+
+	/* ---- Bordures ---- */
+	--color-border: #24303c;
+	--color-border-subtle: #1a232d;
+
+	/* ---- Contenu ---- */
+	--color-content: #e7ecf2;
+	--color-content-lede: #b6c2d0;
+	--color-content-muted: #93a1b0;
+	--color-content-subtle: #7d8a98;
+	--color-content-faint: #5f6c7a;
+	--color-content-ghost: #4e5b69;
+
+	/* ---- Accent ---- */
+	--color-accent: #e3b563;
+	--color-accent-hover: #f2cd8a;
+	--color-accent-contrast: #0a0e13;
+	--color-accent-glow: rgb(227 181 99 / 16%);
+
+	/* ---- États système ---- */
+	--color-danger: #d9705e;
+	--color-danger-surface: rgb(217 112 94 / 10%);
+	--color-success: #7fa98b;
+
+	/* ---- Typographie ---- */
+	--font-display: "Zilla Slab", Georgia, serif;
+	--font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+	--font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+	--text-hero: 8.25rem; /* 132px */
+	--text-hero--line-height: 0.9;
+	--text-hero--letter-spacing: -0.03em;
+	--text-hero--font-weight: 700;
+
+	--text-title: 2.875rem; /* 46px */
+	--text-title--line-height: 1.15;
+	--text-title--letter-spacing: -0.01em;
+
+	--text-numeral: 3.5rem; /* 56px */
+	--text-numeral--line-height: 1;
+
+	--text-heading: 1.6875rem; /* 27px */
+	--text-heading--line-height: 1.25;
+
+	--text-subheading: 1.4375rem; /* 23px */
+	--text-subheading--line-height: 1.3;
+
+	--text-lede: 1.375rem; /* 22px */
+	--text-lede--line-height: 1.6;
+
+	--text-body-lg: 1.125rem; /* 18px */
+	--text-body-lg--line-height: 1.7;
+
+	--text-body: 1rem; /* 16px */
+	--text-body--line-height: 1.75;
+
+	--text-body-sm: 0.9375rem; /* 15px */
+	--text-body-sm--line-height: 1.7;
+
+	--text-ui: 0.875rem; /* 14px */
+	--text-ui--line-height: 1.6;
+
+	--text-meta: 0.8125rem; /* 13px */
+	--text-meta--line-height: 1.7;
+	--text-meta--letter-spacing: 0.06em;
+
+	--text-label: 0.6875rem; /* 11px */
+	--text-label--line-height: 1.4;
+	--text-label--letter-spacing: 0.18em;
+
+	--text-micro: 0.625rem; /* 10px */
+	--text-micro--letter-spacing: 0.18em;
+
+	--tracking-tight-display: -0.03em;
+	--tracking-cta: 0.06em;
+	--tracking-mono: 0.18em;
+	--tracking-mono-wide: 0.22em;
+
+	/* ---- Mesure ---- */
+	--container-shell: 1180px;
+	--container-card: 472px;
+
+	/* ---- Profondeur ---- */
+	--shadow-card: 0 50px 110px -30px rgb(0 0 0 / 95%);
+	--shadow-frame: 0 60px 120px -40px rgb(0 0 0 / 95%);
+
+	/* ---- Mouvement ---- */
+	--ease-out: cubic-bezier(0.2, 0, 0, 1);
+	--animate-hotspot: hotspot 2.6s ease-in-out infinite;
+	--animate-flick: flick 7s ease-in-out infinite;
+
+	/* Aucun --radius-* : le système est entièrement anguleux.
+     Seul le composant Hotspot est rond, via rounded-full local. */
+}
+
+@keyframes hotspot {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.85;
+	}
+	50% {
+		transform: scale(1.35);
+		opacity: 0.35;
+	}
+}
+
+@keyframes flick {
+	0%,
+	100% {
+		opacity: 0.5;
+	}
+	47% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 0.34;
+	}
+	53% {
+		opacity: 0.5;
+	}
+}
+
+@utility vignette {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	box-shadow: inset 0 0 240px 100px rgb(0 0 0 / 90%);
+}
+
+@utility lamp-glow {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background: radial-gradient(
+		75% 55% at 50% 22%,
+		var(--color-accent-glow),
+		transparent 60%
+	);
+}
+
+@layer base {
+	body {
+		background-color: var(--color-surface);
+		color: var(--color-content);
+		font-family: var(--font-sans);
+	}
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-display);
+		text-wrap: balance;
+	}
+	p {
+		text-wrap: pretty;
+	}
+	a {
+		color: var(--color-accent);
+		text-decoration: none;
+	}
+	a:hover {
+		color: var(--color-accent-hover);
+	}
+	input::placeholder {
+		color: var(--color-content-ghost);
+	}
+	::selection {
+		background: var(--color-accent);
+		color: var(--color-accent-contrast);
+	}
+}
