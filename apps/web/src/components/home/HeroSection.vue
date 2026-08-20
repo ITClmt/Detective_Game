@@ -4,10 +4,7 @@
 	><section
 		class="relative flex min-h-screen flex-col items-center justify-center px-6 py-20 text-center sm:px-8 lg:px-16"
 	>
-		<div
-			class="absolute inset-0 pointer-events-none"
-			style="background: radial-gradient(75% 55% at 50% 22%, var(--color-accent-glow), transparent 60%)"
-		></div>
+		<div class="lamp-glow"></div>
 
 		<div class="relative max-w-3xl">
 			<p class="mb-10 font-mono text-meta tracking-mono-wide text-accent">
