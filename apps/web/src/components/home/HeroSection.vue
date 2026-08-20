@@ -9,7 +9,7 @@
 			style="background: radial-gradient(75% 55% at 50% 22%, var(--color-accent-glow), transparent 60%)"
 		></div>
 
-		<div class="relative max-w-3xl px-8">
+		<div class="relative max-w-3xl">
 			<p class="mb-10 font-mono text-meta tracking-mono-wide text-accent">
 				Work in progress
 			</p>
