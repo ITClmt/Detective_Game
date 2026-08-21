@@ -1,6 +1,14 @@
 {
 	"name": "triviani-detective",
 	"private": true,
+	"scripts": {
+		"format:web": "bunx --bun @biomejs/biome format --write apps/web",
+		"lint:web": "bunx --bun @biomejs/biome lint --write apps/web",
+		"check:web": "bunx --bun @biomejs/biome check --write apps/web",
+		"format:api": "bunx --bun @biomejs/biome format --write apps/api",
+		"lint:api": "bunx --bun @biomejs/biome lint --write apps/api",
+		"check:api": "bunx --bun @biomejs/biome check --write apps/api"
+	},
 	"workspaces": [
 		"apps/*",
 		"packages/*"
