@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth.store";
+
+const auth = useAuthStore();
+const { user, isAuthenticated } = storeToRefs(auth);
+
+async function handleLogout() {
+	await auth.logout();
+}
 const currentYear = new Date().getFullYear();
 
 const navLinkClass =
@@ -22,7 +31,18 @@ const navLinkClass =
 			</div>
 
 			<nav class="flex flex-wrap gap-9 font-mono text-label">
-				<RouterLink :to="{ name: 'login' }" :class="navLinkClass">
+				<template v-if="isAuthenticated">
+					<span class="text-accent">{{ user?.username }}</span>
+					<button
+						type="button"
+						class="cursor-pointer"
+						:class="navLinkClass"
+						@click="handleLogout"
+					>
+						DÉCONNEXION
+					</button>
+				</template>
+				<RouterLink v-else :to="{ name: 'login' }" :class="navLinkClass">
 					SE CONNECTER
 				</RouterLink>
 				<RouterLink

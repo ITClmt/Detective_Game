@@ -1,7 +1,20 @@
 <script setup lang="ts">
+import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseField from "@/components/ui/BaseField.vue";
+import { useAuthStore } from "@/stores/auth.store";
 import { useFormValidation } from "@/composables/useFormValidation";
 import { registerFormSchema } from "@/schemas/auth.schema";
+import type {
+	AuthResponse,
+	RegisterParams,
+} from "@repo/shared/schemas/auth.schema";
+import { api, ApiError } from "@/lib/http";
+import { useRouter } from "vue-router";
+import { computed } from "vue";
+import { useMutation } from "@pinia/colada";
+
+const auth = useAuthStore();
+const router = useRouter();
 
 const { values, errorFor, validate } = useFormValidation(registerFormSchema, {
 	username: "",
@@ -10,12 +23,35 @@ const { values, errorFor, validate } = useFormValidation(registerFormSchema, {
 	confirmPassword: "",
 });
 
+const { mutate, isLoading, error } = useMutation({
+	mutation: (params: RegisterParams) =>
+		api<AuthResponse>("/auth/register", { method: "POST", body: params }),
+	onSuccess: (session) => {
+		auth.setSession(session);
+		router.push({ name: "home" });
+	},
+});
+
+const errorMessage = computed(() => {
+	if (!error.value) return null;
+
+	if (error.value instanceof ApiError) {
+		return "Erreur lors de l'inscription. Veuillez réessayer.";
+	}
+
+	return "Connexion au serveur impossible";
+});
+
 function handleSubmit() {
 	const data = validate();
 
 	if (!data) return;
 
-	console.log("register", data);
+	mutate({
+		username: data.username,
+		email: data.email,
+		password: data.password,
+	});
 }
 </script>
 
@@ -58,11 +94,13 @@ function handleSubmit() {
 			placeholder="••••••••"
 		/>
 
-		<button
-			type="submit"
-			class="mt-1.5 w-full border border-accent bg-accent py-4 font-sans font-semibold text-ui tracking-cta text-accent-contrast transition-colors duration-150 hover:border-accent-hover hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-accent-hover focus-visible:outline-offset-[3px]"
+		<p
+			v-if="errorMessage"
+			class="border border-danger bg-danger-surface px-3.75 py-3 font-mono text-[11px] leading-relaxed text-danger"
 		>
-			CRÉER MON COMPTE
-		</button>
+			&gt; {{ errorMessage }}
+		</p>
+
+		<BaseButton :loading="isLoading"> CRÉER MON COMPTE </BaseButton>
 	</form>
 </template>
