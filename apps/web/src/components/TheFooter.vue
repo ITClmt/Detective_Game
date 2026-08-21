@@ -17,7 +17,7 @@ const navLinkClass =
 					TRIVIANI DETECTIVE
 				</p>
 				<p class="font-mono text-label text-content-faint">
-					© {{ currentYear }} — Tous droits réservés
+					© {{ currentYear }} - Tous droits réservés
 				</p>
 			</div>
 
