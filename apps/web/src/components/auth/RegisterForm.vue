@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import BaseButton from "@/components/ui/BaseButton.vue";
-import BaseField from "@/components/ui/BaseField.vue";
-import { useAuthStore } from "@/stores/auth.store";
-import { useFormValidation } from "@/composables/useFormValidation";
-import { registerFormSchema } from "@/schemas/auth.schema";
+import { useMutation } from "@pinia/colada";
 import type {
 	AuthResponse,
 	RegisterParams,
 } from "@repo/shared/schemas/auth.schema";
-import { api, ApiError } from "@/lib/http";
-import { useRouter } from "vue-router";
 import { computed } from "vue";
-import { useMutation } from "@pinia/colada";
+import { useRouter } from "vue-router";
+import BaseButton from "@/components/ui/BaseButton.vue";
+import BaseField from "@/components/ui/BaseField.vue";
+import { useFormValidation } from "@/composables/useFormValidation";
+import { ApiError, api } from "@/lib/http";
+import { registerFormSchema } from "@/schemas/auth.schema";
+import { useAuthStore } from "@/stores/auth.store";
 
 const auth = useAuthStore();
 const router = useRouter();

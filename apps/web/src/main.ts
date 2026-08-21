@@ -3,9 +3,9 @@ import "@fontsource/ibm-plex-sans";
 import "@fontsource/zilla-slab";
 import "./assets/main.css";
 
+import { PiniaColada } from "@pinia/colada";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
-import { PiniaColada } from "@pinia/colada";
 import { useAuthStore } from "@/stores/auth.store";
 
 import App from "./App.vue";

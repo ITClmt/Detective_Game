@@ -3,10 +3,10 @@ import {
 	createWebHistory,
 	type RouteRecordRaw,
 } from "vue-router";
+import { useAuthStore } from "@/stores/auth.store";
 import AuthView from "@/views/AuthView.vue";
 import HomeView from "@/views/HomeView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
-import { useAuthStore } from "@/stores/auth.store";
 
 declare module "vue-router" {
 	interface RouteMeta {

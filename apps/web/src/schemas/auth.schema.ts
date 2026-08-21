@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { registerSchema } from "@repo/shared/schemas/auth.schema";
+import { z } from "zod";
 
 export const registerFormSchema = registerSchema
 	.extend({
