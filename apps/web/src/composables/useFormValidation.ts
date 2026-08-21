@@ -1,4 +1,4 @@
-import { computed, reactive, ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 import { z } from "zod";
 
 /**
@@ -12,10 +12,10 @@ export function useFormValidation<Values extends object, Output>(
 	schema: z.ZodType<Output, Values>,
 	initialValues: Values,
 ) {
-	const values = reactive({ ...initialValues }) as Values;
+	const values = ref({ ...initialValues }) as Ref<Values>;
 	const submitted = ref(false);
 
-	const result = computed(() => schema.safeParse(values));
+	const result = computed(() => schema.safeParse(values.value));
 
 	const fieldErrors = computed(() =>
 		result.value.success
@@ -28,6 +28,7 @@ export function useFormValidation<Values extends object, Output>(
 
 	function errorFor(field: keyof Values & string) {
 		if (!submitted.value) return undefined;
+
 		return fieldErrors.value?.[field]?.[0];
 	}
 
@@ -38,5 +39,11 @@ export function useFormValidation<Values extends object, Output>(
 		return result.value.success ? result.value.data : null;
 	}
 
-	return { values, submitted, errorFor, validate };
+	/** Remet le formulaire dans son état initial - impossible avec reactive. */
+	function reset() {
+		values.value = { ...initialValues };
+		submitted.value = false;
+	}
+
+	return { values, submitted, errorFor, validate, reset };
 }
