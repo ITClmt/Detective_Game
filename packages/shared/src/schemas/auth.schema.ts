@@ -2,19 +2,19 @@ import z from "zod";
 
 const passwordSchema = z
 	.string()
-	.min(6, "Password must be at least 6 characters long")
-	.max(32, "Password must be at most 32 characters long")
+	.min(6, "Le mot de passe doit contenir au moins 6 caractères")
+	.max(32, "Le mot de passe ne doit pas dépasser 32 caractères")
 	.regex(
 		/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-		"Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character",
+		"Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial",
 	);
 
 const registerSchema = z.object({
 	username: z
 		.string()
-		.min(3, "Username must be at least 3 characters long")
-		.max(32, "Username must be at most 32 characters long"),
-	email: z.email(),
+		.min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères")
+		.max(32, "Le nom d'utilisateur ne doit pas dépasser 32 caractères"),
+	email: z.email("Adresse email invalide"),
 	password: passwordSchema,
 });
 
