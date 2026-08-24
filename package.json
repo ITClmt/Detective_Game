@@ -2,6 +2,8 @@
 	"name": "triviani-detective",
 	"private": true,
 	"scripts": {
+		"dev:web": "bun run --cwd apps/web dev",
+		"dev:api": "bun run --cwd apps/api dev",
 		"format:web": "bunx --bun @biomejs/biome format --write apps/web",
 		"lint:web": "bunx --bun @biomejs/biome lint --write apps/web",
 		"check:web": "bunx --bun @biomejs/biome check --write apps/web",

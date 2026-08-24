@@ -252,3 +252,10 @@ vide, `src/stores/counter.ts` est le store d'exemple du template, et
   *pourquoi* (le piège évité, la propriété de sécurité visée), pas le *quoi*.
 - Les `.env` ne sont jamais committés ; tout `.env.example` modifié doit rester
   synchronisé avec le schéma Zod correspondant.
+- Tu peux utiliser les outils disponible (comme Bruno for API testing)
+
+## Docs
+
+- Full Docs Hono : https://hono.dev/llms-full.txt
+- Docs List Hono : https://hono.dev/llms.txt
+
