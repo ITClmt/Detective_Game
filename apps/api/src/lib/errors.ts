@@ -8,14 +8,30 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 export class AppError extends Error {
 	readonly status: ContentfulStatusCode;
 	readonly code: string;
+	readonly headers?: Record<string, string>;
 
-	constructor(status: ContentfulStatusCode, code: string, message: string) {
+	constructor(
+		status: ContentfulStatusCode,
+		code: string,
+		message: string,
+		headers?: Record<string, string>,
+	) {
 		super(message);
 		this.name = "AppError";
 		this.status = status;
 		this.code = code;
+		this.headers = headers;
 	}
 }
+
+export const tooManyRequests = (
+	code: string,
+	message: string,
+	retryAfterSeconds: number,
+) =>
+	new AppError(429, code, message, {
+		"Retry-After": String(retryAfterSeconds),
+	});
 
 export const badRequest = (code: string, message: string) =>
 	new AppError(400, code, message);

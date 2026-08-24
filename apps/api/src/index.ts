@@ -39,6 +39,7 @@ app.onError((err, c) => {
 		return c.json(
 			{ error: { code: err.code, message: err.message } },
 			err.status,
+			err.headers,
 		);
 	}
 
