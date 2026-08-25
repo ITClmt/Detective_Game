@@ -32,9 +32,6 @@ const envSchema = z.object({
 		.enum(["true", "false"])
 		.default("true")
 		.transform((value) => value === "true"),
-
-	/** Nombre maximum de hachages argon2 simultanés (chaque hash réserve ~64 Mo). */
-	PASSWORD_HASH_CONCURRENCY: z.coerce.number().int().positive().default(4),
 });
 
 export const env = envSchema.parse(process.env);
