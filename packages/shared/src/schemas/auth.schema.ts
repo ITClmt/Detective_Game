@@ -19,8 +19,8 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-	email: z.email(),
-	password: passwordSchema,
+	email: z.email("Adresse email invalide"),
+	password: z.string().min(1, "Mot de passe requis"),
 });
 
 const publicUserSchema = z.object({

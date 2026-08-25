@@ -10,10 +10,4 @@ export const registerFormSchema = registerSchema
 		path: ["confirmPassword"],
 	});
 
-export const loginFormSchema = z.object({
-	email: z.email("Adresse email invalide"),
-	password: z
-		.string()
-		.min(1, "Mot de passe requis")
-		.max(32, "Mot de passe trop long"),
-});
+export { loginSchema as loginFormSchema } from "@repo/shared/schemas/auth.schema";
