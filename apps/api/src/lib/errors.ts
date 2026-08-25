@@ -41,3 +41,6 @@ export const unauthorized = (code: string, message: string) =>
 
 export const conflict = (code: string, message: string) =>
 	new AppError(409, code, message);
+
+export const payloadTooLarge = (code: string, message: string) =>
+	new AppError(413, code, message);

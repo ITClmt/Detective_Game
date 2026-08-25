@@ -1,25 +1,8 @@
-import type { Context } from "hono";
-import { getConnInfo } from "hono/bun";
 import { createMiddleware } from "hono/factory";
 import { env } from "../env";
+import { clientIp } from "../lib/clientIp";
 import { tooManyRequests } from "../lib/errors";
 import { memoryRateLimitStore } from "../lib/rateLimitStore";
-
-/**
- * X-Forwarded-For a la forme "client, proxy1, proxy2" : la première valeur
- * est le client d'origine. Elle n'est digne de confiance que si un proxy
- * maîtrisé l'a écrite — sinon n'importe qui s'invente une IP par requête.
- */
-const clientIp = (c: Context) => {
-	if (env.TRUST_PROXY) {
-		const forwarded = c.req.header("x-forwarded-for");
-		const client = forwarded?.split(",")[0]?.trim();
-
-		if (client) return client;
-	}
-
-	return getConnInfo(c).remote.address ?? "unknown";
-};
 
 type RateLimitOptions = {
 	/** Sépare les compteurs : "login" et "register" ne partagent pas leur quota. */

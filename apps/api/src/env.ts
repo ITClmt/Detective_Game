@@ -20,15 +20,12 @@ const envSchema = z.object({
 		.default(60 * 60 * 24 * 30),
 
 	/**
-	 * Autorise la lecture de X-Forwarded-For pour identifier le client.
-	 * À true UNIQUEMENT derrière un proxy de confiance (Traefik) : si l'API
-	 * est joignable en direct, l'en-tête est fourni par l'appelant et le rate
-	 * limit se contourne en changeant une ligne de curl.
+	 * Nombre de proxies de confiance devant l'API.
+	 * 0 = aucun (dev, ou conteneur joignable en direct)
+	 * 1 = Traefik / Dokploy
+	 * 2 = Cloudflare puis Traefik
 	 */
-	TRUST_PROXY: z
-		.enum(["true", "false"])
-		.default("false")
-		.transform((value) => value === "true"),
+	TRUSTED_PROXY_COUNT: z.coerce.number().int().min(0).default(0),
 
 	/** Coupe-circuit pour le dev et la suite Bruno, qui rejouent les mêmes appels. */
 	RATE_LIMIT_ENABLED: z
