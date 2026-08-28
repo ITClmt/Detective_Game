@@ -18,43 +18,37 @@ Boucle de jeu visée :
 Objectif de la V1 : **une histoire complète et jouable** de bout en bout —
 quelques scènes, des personnages, des dialogues — pas un catalogue d'affaires.
 
-Le contenu narratif est pensé pour tenir dans **un JSON par histoire** (scènes,
-personnages, dialogues, conditions de déblocage), le moteur se contentant de
-l'interpréter. Cette piste est retenue mais **pas encore implémentée** : ni le
-format, ni le moteur de scènes, ni le modèle de progression n'existent dans le
-code aujourd'hui. Un premier jet complet vit dans
-[content/verdier.json](content/verdier.json), pour explorer la forme avant de
-la figer en schéma.
+Le contenu narratif tient dans **un JSON par histoire** (scènes, personnages,
+dialogues, conditions de déblocage), le moteur se contentant de l'interpréter.
+Le format est figé par [case.schema.ts](packages/shared/src/schemas/case.schema.ts)
+et le moteur vit dans [engine.ts](packages/shared/src/game/engine.ts) ; la
+première enquête complète est [content/verdier.json](content/verdier.json),
+non versionnée (voir `.gitignore`) mais servant de fixture aux tests de
+`packages/shared`.
 
-Un piège déjà identifié en écrivant ce premier JSON, à trancher explicitement
-quand le schéma Zod du moteur se conçoit : la clé `when` n'a pas la même
-sémantique selon où elle apparaît. Sur les `branches` d'un hotspot, la
-convention est « première branche dont le `when` matche, sinon celle sans
-`when` en dernier » — un ordre exclusif. Sur les `options` d'un dialogue,
-toutes celles dont le `when` matche s'affichent — un filtre additif. Mélanger
-les deux sans le documenter produit des options dupliquées à l'écran (vécu sur
-`laya_studio` / nœud `interphone`). La grammaire de conditions elle-même
-(`hasClue`, `hasFlag`, `clueCount`, `all`) manque de `any` et de `not` — ils
-finiront par être nécessaires, autant les prévoir dans le schéma dès le
-départ plutôt que les ajouter au coup par coup.
+Le piège central du format, déjà tranché mais à ne jamais refaire converger :
+la clé `when` n'a pas la même sémantique selon où elle apparaît.
 
-Troisième sémantique, distincte des deux précédentes : les `endings` de
-`resolution` ont besoin de sélectionner un texte selon la **réponse** donnée
-par le joueur (`culprit`, `motive`, `method`), pas selon l'état de partie
-(clues/flags) qu'évalue `when` partout ailleurs. C'est un espace de noms qui
-n'existe même pas pendant l'exploration — un évaluateur unique appliqué
-naïvement à `when` sur les trois structures planterait ou renverrait `false`
-en silence sur celle-ci. D'où une clé distincte, `matchAnswers`, réservée aux
-`endings` :
+| Où | Sémantique | Fonction du moteur |
+|---|---|---|
+| `hotspot.branches[]`, `scene.background[]` | **exclusive** — la première qui matche gagne, celle sans `when` en dernier recours | `pickFirstMatch()` |
+| `dialogueNode.options[]` | **additive** — toutes celles qui matchent s'affichent | `filterAllMatches()` |
+| `solution.endings[]` (`matchAnswers`) | **réponses** — compare `culprit`/`motive`/`method`, pas l'état de partie | `matchAnswers()`, puis `pickEnding()` |
+
+Mélanger les deux premières produit des options dupliquées à l'écran (vécu sur
+`laya_studio` / nœud `interphone`). La troisième n'est même pas une
+`Condition` : elle évalue un espace de noms qui n'existe pas pendant
+l'exploration, et un évaluateur de `when` appliqué là renverrait `false` en
+silence. D'où trois fonctions distinctes qui ne s'appellent jamais entre elles.
 
 ```json
 { "score": 2, "matchAnswers": { "culprit": "camille" }, ... }
 ```
 
-Le contenu actuel utilise déjà les trois — `when` exclusif sur les branches,
-`when` additif sur les options de dialogue, `matchAnswers` sur les endings —
-et le moteur devra les distinguer explicitement dans son évaluateur, pas les
-faire converger sur une seule fonction générique.
+La grammaire de conditions porte `hasClue`, `hasFlag`, `hasItem`, `clueCount`,
+`all`, `any`, `not`. `any` et `not` ne servent nulle part dans le contenu
+actuel : ils ont été prévus dès le départ pour ne pas avoir à re-valider tout
+le contenu déjà écrit le jour où ils deviennent nécessaires.
 
 Choix d'art retenu : un personnage optionnellement présent dans une scène
 (Camille, absente du duplex une fois l'hôpital débloqué) se traduit par une
@@ -93,11 +87,21 @@ chaque mécanique, seul le rendu de la mécanique elle-même varie. Une nouvelle
 enquête avec une mécanique différente ajoute une valeur d'`action` et un
 composant, jamais un nouveau verbe d'effet au niveau racine.
 
-État réel du dépôt : seule l'authentification est écrite (register / login /
-refresh / logout / me). Le domaine de jeu — enquêtes, scènes, progression du
-joueur — reste **entièrement à concevoir**, côté schéma DB comme côté front. Le
-jeu est en phase de conception : sur ces sujets, proposer et faire valider
-plutôt que trancher seul.
+État réel du dépôt : l'authentification et le domaine de jeu côté serveur sont
+écrits — format d'enquête, moteur, tables `cases` / `player_cases`, et les
+quatre routes du module `cases` (lecture, progression, résolution). **Le front
+reste entièrement à faire** : `apps/web` est le scaffold `create-vue` d'origine,
+avec un tableau `routes` vide.
+
+Ce qui manque encore côté moteur, volontairement laissé de côté : rien ne relie
+`scene.unlockWhen` à `PlayerState.unlockedScenes`. Il faudra un
+`isSceneUnlocked()` (une scène **sans** `unlockWhen` est ouverte d'emblée, elle
+n'entre jamais dans `unlockedScenes` — sinon Halo Studio est injouable) et un
+`refreshUnlockedScenes()` appelé après chaque `applyEffects`, qui renvoie les
+scènes nouvellement ouvertes pour que leur `unlockText` se joue une seule fois.
+
+Le jeu reste en phase de conception : sur le gameplay et le format, proposer et
+faire valider plutôt que trancher seul.
 
 ## Structure
 
@@ -105,8 +109,9 @@ plutôt que trancher seul.
 |---|---|
 | `apps/api` | API HTTP — Bun + Hono + Drizzle ORM (Postgres) |
 | `apps/web` | SPA — Vue 3 + Vite + Pinia + vue-router |
-| `packages/shared` | Schémas Zod et types partagés front/back (`@repo/shared`) |
+| `packages/shared` | Schémas Zod, types partagés et moteur de jeu (`@repo/shared`) |
 | `apps/api/bruno` | Collection Bruno : tests d'intégration HTTP de l'API |
+| `content/` | Enquêtes au format JSON — **non versionné**, seedé en local |
 
 Le lockfile (`bun.lock`), la config Biome, `tsconfig.base.json` et le
 `docker-compose.yml` vivent à la racine. Il n'y a **aucun script npm à la
@@ -120,8 +125,17 @@ racine** : tout passe par `bun run --cwd <app>` ou `bunx`.
 cp .env.example .env
 cp apps/api/.env.example apps/api/.env
 docker compose up -d db
+bun run --cwd apps/api db:migrate
+bun run --cwd apps/api db:seed
 bun run --cwd apps/api dev
 ```
+
+`db:seed` charge `content/verdier.json`, le valide avec `parseCaseFile()` et
+l'insère dans `cases` — les colonnes SQL (`slug`, `title`, `sort_order`,
+`is_published`) sont dérivées du jsonb, jamais l'inverse. Le script est un
+upsert sur `slug` : relançable à volonté pendant qu'on itère sur le contenu.
+Une enquête dont `case.isPublished` vaut `false` est seedée mais invisible de
+l'API, qui filtre `is_published: true`.
 
 Postgres est exposé sur le port hôte **5433**, l'API sur **3000**.
 `docker compose up` (sans service nommé) build aussi l'image API et la fait
@@ -175,6 +189,16 @@ bun run --cwd apps/web type-check
 
 ### Tests
 
+`packages/shared` — Vitest, couvre le schéma d'enquête et le moteur contre
+`content/verdier.json` pris comme fixture :
+
+```bash
+bun run --cwd packages/shared test:unit --run
+```
+
+Les tests lisent la fixture au lieu de coder en dur des valeurs de contenu :
+un renommage de personnage ou une URL d'asset changée ne doit pas les casser.
+
 Front — Vitest + jsdom :
 
 ```bash
@@ -189,18 +213,27 @@ bun run --cwd apps/web test:unit -- --run src/__tests__/App.spec.ts
 bun run --cwd apps/web test:unit -- --run -t "mounts renders"
 ```
 
-API — pas de tests unitaires, la couverture passe par Bruno. La base et l'API
-doivent tourner. Depuis `apps/api/bruno` :
+API — pas de tests unitaires, la couverture passe par Bruno. La base, le seed
+et l'API doivent tourner. Depuis `apps/api/bruno` :
 
 ```bash
 bunx @usebruno/cli run --env Local -r
 ```
 
-L'ordre des dossiers compte (`Health` → `Auth` → `Erreurs` → `Securite`) :
-`Auth/Register` génère l'email de test et le publie en variable runtime
-`testEmail` que les requêtes suivantes réutilisent — lancer `Login` seul ne
-marche pas. Voir [apps/api/bruno/README.md](apps/api/bruno/README.md) pour le
-détail, notamment la manipulation du cookie jar.
+L'ordre des dossiers compte (`Health` → `Auth` → `Erreurs` → `Securite` →
+`Cases`) : `Auth/Register` génère l'email de test et le publie en variable
+runtime `testEmail` que les requêtes suivantes réutilisent — lancer `Login`
+seul ne marche pas. Même chose pour `Cases`, qui est un scénario ordonné
+(lecture → progression → résolution) sur l'utilisateur neuf du run.
+
+Piège de rejeu : relancer la collection plusieurs fois dans l'heure épuise le
+rate limiter de `register` (5/heure) et fait échouer tout le reste en cascade
+par manque de token. Le store est une `Map` en mémoire — redémarrer l'API le
+remet à zéro.
+
+Voir [apps/api/bruno/README.md](apps/api/bruno/README.md) pour le détail :
+manipulation du cookie jar, dépendances d'ordre, et le fait que `bru.getVar()`
+ne lit que les variables runtime, jamais celles du fichier d'environnement.
 
 ### Lint / format
 
@@ -253,6 +286,11 @@ point qui sérialise, toujours sous la même forme :
 Ce qui n'est pas une `AppError` est loggé côté serveur et renvoyé en 500
 anonyme. Ne jamais construire une réponse d'erreur depuis un handler.
 
+Le choix entre les deux n'est pas cosmétique : `AppError` veut dire « le client
+peut corriger sa requête ». Un contenu d'enquête incomplet (aucune fin ne
+couvrant un score atteignable, dans `casesService.solve`) lève un `Error` nu —
+le client n'y peut rien, c'est un bug serveur.
+
 Corollaire pour la validation : utiliser `jsonValidator` de
 [src/lib/validator.ts](apps/api/src/lib/validator.ts), jamais `zValidator`
 brut — `zValidator` répond lui-même en 400 avec le `ZodError` sans passer par
@@ -287,6 +325,44 @@ d'emails) ; `login` vérifie un hash bidon quand l'email est inconnu pour rester
 à temps constant ; `logout` est idempotent. Les mots de passe sont hachés avec
 `Bun.password`.
 
+### Enquêtes et progression
+
+Module `cases`, quatre routes, toutes derrière `requireAuth` :
+
+| Route | Rôle |
+|---|---|
+| `GET /cases/:slug` | le `CaseFile` **sans `solution`** |
+| `GET /cases/:slug/progress` | crée l'état de départ au premier appel, relit ensuite |
+| `PUT /cases/:slug/progress` | remplace l'état par celui envoyé par le front |
+| `POST /cases/:slug/solve` | score les réponses, choisit la fin, pose `solved_at` |
+
+**Le back stocke, il ne rejoue pas le moteur.** C'est le front qui appelle
+`applyEffects` et compagnie à chaque clic ; l'API se contente de persister le
+`PlayerState` qu'on lui tend. Corollaire assumé : `resolution.unlockWhen` n'est
+pas vérifié côté serveur, et un joueur peut appeler `solve` quand il veut. Le
+jeu est solo et sans classement — la triche ne lèse personne, et une
+revalidation métier côté back avait justement été retirée pour ça.
+
+La seule chose que le serveur protège, c'est le **spoiler non sollicité** :
+`stripSolution()` retire `solution` de `GET /cases/:slug`, parce que n'importe
+qui ouvrant l'onglet Réseau y verrait le coupable sans l'avoir cherché. En
+revanche `interaction.params.answer` (un code d'énigme) part au client — décision
+explicite, pas un oubli. `solve` est le seul endroit qui lit `solution`.
+
+Deux gardes-fou à ne pas casser :
+
+- `getProgress` fait un `return` anticipé quand la ligne existe, au lieu de
+  passer par l'upsert : sinon un premier appel concurrent écraserait une partie
+  entamée par l'état de départ.
+- `solved_at` est posé par update conditionnel (`WHERE solved_at IS NULL`), même
+  patron que `revokeRefreshToken`. Rejouer la résolution reste permis, mais la
+  date du premier succès est ce qui débloquera les enquêtes suivantes
+  (`cases.unlock_requirement`) et ne doit pas glisser.
+
+`GET /cases/:slug/progress` revalide l'état relu avec `playerStateSchema` avant
+de le renvoyer : une sauvegarde écrite avant une évolution du format lève une
+erreur nette au lieu de casser le front sur un champ absent.
+
 ### Environnement
 
 [apps/api/src/env.ts](apps/api/src/env.ts) valide `process.env` avec Zod **au
@@ -305,6 +381,22 @@ formulaires avec les mêmes. Ajouter un schéma = l'exporter depuis
 
 L'import se fait par sous-chemin (`@repo/shared/schemas/auth.schema`) ou par la
 racine (`@repo/shared`) ; les deux marchent via les `exports` du package.
+
+`packages/shared` porte aussi le **moteur de jeu** (`src/game/`) : `engine.ts`
+(évaluation des conditions, effets, score et fins), `state.ts` (`PlayerState`
+et son schéma) et `public.ts` (`stripSolution`). Il tourne côté front ; le back
+n'en importe que `playerStateSchema`, `createPlayerState`, `stripSolution` et
+`pickEnding`.
+
+Un point de vigilance sur `PlayerState.seenDialogueNodes` (les sujets de
+dialogue déjà joués, pour les griser sans les interdire) : la clé est
+`${characterId}.${nodeId}`, **pas** `${dialogueId}.${nodeId}`. La question du
+joueur est « ai-je déjà demandé ça à Camille ? », pas « dans quelle pièce » —
+et `camille_confrontation` reprend volontairement des nœuds de `camille_duplex`
+au cas où le joueur les aurait manqués. Toujours passer par `dialogueNodeKey()`
+plutôt que de concaténer à la main, sinon front et sauvegarde divergent en
+silence sur le séparateur. Conséquence côté contenu : deux dialogues d'un même
+personnage ne doivent réutiliser un id de nœud que pour le **même** sujet.
 
 ## Front
 
