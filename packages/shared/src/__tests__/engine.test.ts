@@ -281,22 +281,32 @@ describe("pickEnding", () => {
 
 describe("resolveBackground", () => {
 	it("renvoie la chaîne telle quelle sur un fond fixe", () => {
-		expect(resolveBackground(findScene("studio"), stateWith({}))).toBe(
-			"https://assets.triviani.local/verdier/scenes/studio.webp",
-		);
+		const studio = findScene("studio");
+		if (typeof studio.background !== "string") {
+			throw new Error("Le fond de « studio » devrait être une chaîne fixe");
+		}
+
+		expect(resolveBackground(studio, stateWith({}))).toBe(studio.background);
 	});
 
 	it("bascule sur la planche « duplex vide » quand Camille est partie", () => {
 		const duplex = findScene("duplex");
+		if (!Array.isArray(duplex.background)) {
+			throw new Error(
+				"Le fond de « duplex » devrait être une liste de variantes",
+			);
+		}
+		const [withClue, catchAll] = duplex.background;
+		if (!withClue || !catchAll) {
+			throw new Error("« duplex » devrait avoir deux variantes de fond");
+		}
 
-		expect(resolveBackground(duplex, stateWith({}))).toBe(
-			"https://assets.triviani.local/verdier/scenes/duplex.webp",
-		);
+		expect(resolveBackground(duplex, stateWith({}))).toBe(catchAll.image);
 		expect(
 			resolveBackground(
 				duplex,
 				stateWith({ clues: ["clue_messages_telephone"] }),
 			),
-		).toBe("https://assets.triviani.local/verdier/scenes/duplex_vide.webp");
+		).toBe(withClue.image);
 	});
 });

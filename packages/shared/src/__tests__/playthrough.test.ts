@@ -128,9 +128,12 @@ describe("parcours complet — affaire Verdier", () => {
 		// plus au duplex, l'hôpital s'ouvre.
 		// ---------------------------------------------------------------------
 		const duplex = findScene("duplex");
-		expect(resolveBackground(duplex, state)).toBe(
-			"https://assets.triviani.local/verdier/scenes/duplex_vide.webp",
-		);
+		if (!Array.isArray(duplex.background) || !duplex.background[0]) {
+			throw new Error(
+				"« duplex » devrait avoir une variante de fond conditionnelle",
+			);
+		}
+		expect(resolveBackground(duplex, state)).toBe(duplex.background[0].image);
 
 		const camilleGone = clickHotspot(state, "duplex", "hs_parler_camille");
 		expect(camilleGone.effects[0]).not.toHaveProperty("startDialogue");
