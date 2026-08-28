@@ -1,0 +1,50 @@
+meta {
+  name: Save progress
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/cases/{{caseSlug}}/progress
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "clues": ["clue_capuchon_aiguille", "clue_verre_vin"],
+    "flags": ["camille_interrogee"],
+    "inventory": ["item_capuchon_aiguille"],
+    "unlockedScenes": ["duplex", "studio"],
+    "currentSceneId": "studio",
+    "seenDialogueNodes": ["camille.accueil", "camille.nuit", "camille.capuchon"]
+  }
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("renvoie l'état envoyé", function () {
+    const state = res.getBody().state;
+    expect(state.clues).to.deep.equal([
+      "clue_capuchon_aiguille",
+      "clue_verre_vin",
+    ]);
+    expect(state.currentSceneId).to.equal("studio");
+  });
+
+  test("persiste les sujets de dialogue joués", function () {
+    expect(res.getBody().state.seenDialogueNodes).to.deep.equal([
+      "camille.accueil",
+      "camille.nuit",
+      "camille.capuchon",
+    ]);
+  });
+}

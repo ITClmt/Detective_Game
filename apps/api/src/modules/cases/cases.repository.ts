@@ -1,6 +1,7 @@
+import type { PlayerState } from "@repo/shared/game/state";
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db/client";
-import { casesTable } from "../../db/schema/index";
+import { casesTable, playerCasesTable } from "../../db/schema/index";
 
 const casesRepository = {
 	findBySlug: async (slug: string) => {
@@ -11,6 +12,38 @@ const casesRepository = {
 			.limit(1);
 
 		return caseRow;
+	},
+
+	findPlayerCase: async (userId: string, caseId: string) => {
+		const [row] = await db
+			.select()
+			.from(playerCasesTable)
+			.where(
+				and(
+					eq(playerCasesTable.user_id, userId),
+					eq(playerCasesTable.case_id, caseId),
+				),
+			)
+			.limit(1);
+
+		return row;
+	},
+
+	upsertPlayerCase: async (
+		userId: string,
+		caseId: string,
+		state: PlayerState,
+	) => {
+		const [row] = await db
+			.insert(playerCasesTable)
+			.values({ user_id: userId, case_id: caseId, state })
+			.onConflictDoUpdate({
+				target: [playerCasesTable.user_id, playerCasesTable.case_id],
+				set: { state, updated_at: new Date() },
+			})
+			.returning();
+
+		return row;
 	},
 };
 

@@ -1,0 +1,42 @@
+meta {
+  name: Progress - clé inconnue
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{baseUrl}}/cases/{{caseSlug}}/progress
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "clues": [],
+    "flags": [],
+    "inventory": [],
+    "unlockedScenes": ["duplex"],
+    "currentSceneId": "duplex",
+    "seenDialogueNodes": [],
+    "seenDialogNodes": ["camille.nuit"]
+  }
+}
+
+tests {
+  // `playerStateSchema` est un strictObject : `seenDialogNodes` (faute de
+  // frappe) est refusé au lieu d'être ignoré. Sans ça, le front croirait
+  // sauvegarder sa progression de dialogue et la perdrait à chaque écriture,
+  // sans la moindre erreur.
+  test("répond 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("code VALIDATION_ERROR", function () {
+    expect(res.getBody().error.code).to.equal("VALIDATION_ERROR");
+  });
+}

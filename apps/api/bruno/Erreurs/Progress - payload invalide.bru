@@ -1,0 +1,35 @@
+meta {
+  name: Progress - payload invalide
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{baseUrl}}/cases/{{caseSlug}}/progress
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "clues": [],
+    "flags": [],
+    "inventory": [],
+    "unlockedScenes": []
+  }
+}
+
+tests {
+  test("répond 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("code VALIDATION_ERROR", function () {
+    expect(res.getBody().error.code).to.equal("VALIDATION_ERROR");
+  });
+}

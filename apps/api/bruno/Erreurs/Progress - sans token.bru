@@ -1,0 +1,21 @@
+meta {
+  name: Progress - sans token
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/cases/{{caseSlug}}/progress
+  body: none
+  auth: none
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code MISSING_ACCESS_TOKEN", function () {
+    expect(res.getBody().error.code).to.equal("MISSING_ACCESS_TOKEN");
+  });
+}

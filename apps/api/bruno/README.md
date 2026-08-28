@@ -34,7 +34,7 @@ Les dossiers sont numérotés et **l'ordre compte** :
 | `Auth` | le parcours nominal, de l'inscription au logout |
 | `Erreurs` | les rejets attendus (400 / 401 / 404 / 409) |
 | `Securite` | rotation du refresh et détection de rejeu |
-| `Cases` | lecture d'une enquête publiée par son slug |
+| `Cases` | lecture d'une enquête publiée, et sa progression joueur |
 
 `Auth/Register` génère un email unique à chaque exécution (`sherlock+<timestamp>`),
 donc la collection est rejouable sans vider la base entre deux runs. Les
@@ -54,6 +54,14 @@ fichier d'environnement — sinon l'UI Bruno commiterait des tokens à chaque ru
 avant. Le repository de `cases` filtre `is_published: true` : si l'enquête
 seedée est en brouillon (`case.isPublished: false` dans le JSON), ce test
 échoue en 404 — c'est attendu, pas un bug de la collection.
+
+Le dossier `Cases` est un scénario ordonné, pas quatre requêtes indépendantes :
+`Get by slug` publie `startScene` en variable runtime (lue dans la réponse
+plutôt que codée en dur, le contenu n'étant pas versionné), puis
+`Get progress` → `Save progress` → `Get progress après sauvegarde` vérifient le
+cycle création / écriture / relecture. Le dernier test tient parce que
+`Auth/Register` crée un utilisateur neuf à chaque run : sa ligne `player_cases`
+n'existe pas encore, donc le premier `GET` doit bien renvoyer l'état de départ.
 
 ## Le cookie de refresh
 

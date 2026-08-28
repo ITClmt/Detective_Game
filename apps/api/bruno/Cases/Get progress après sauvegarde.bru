@@ -1,0 +1,44 @@
+meta {
+  name: Get progress après sauvegarde
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/cases/{{caseSlug}}/progress
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("relit la progression sauvegardée", function () {
+    const state = res.getBody().state;
+    expect(state.clues).to.deep.equal([
+      "clue_capuchon_aiguille",
+      "clue_verre_vin",
+    ]);
+    expect(state.flags).to.deep.equal(["camille_interrogee"]);
+    expect(state.currentSceneId).to.equal("studio");
+  });
+
+  test("un sujet joué au duplex reste connu pour la confrontation", function () {
+    // La clé est au personnage, pas au dialogue : `camille.capuchon` posé
+    // dans `camille_duplex` doit rester vu quand `camille_confrontation`
+    // reproposera la même question à l'hôpital.
+    expect(res.getBody().state.seenDialogueNodes).to.include("camille.capuchon");
+  });
+
+  test("ne réécrase pas une partie entamée par l'état de départ", function () {
+    expect(res.getBody().state.currentSceneId).to.not.equal(
+      bru.getVar("startScene")
+    );
+  });
+}

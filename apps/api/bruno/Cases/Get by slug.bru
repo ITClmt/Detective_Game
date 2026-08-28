@@ -14,6 +14,14 @@ headers {
   Authorization: Bearer {{accessToken}}
 }
 
+script:post-response {
+  // La scène de départ alimente les tests de progression : la lire ici
+  // évite de coder en dur une valeur du contenu, qui n'est pas versionné.
+  if (res.getStatus() === 200) {
+    bru.setVar("startScene", res.getBody().content.startScene);
+  }
+}
+
 tests {
   test("répond 200", function () {
     expect(res.getStatus()).to.equal(200);

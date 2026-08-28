@@ -1,0 +1,35 @@
+meta {
+  name: Get progress
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/cases/{{caseSlug}}/progress
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("crée l'état de départ au premier appel", function () {
+    const state = res.getBody().state;
+    expect(state.currentSceneId).to.equal(bru.getVar("startScene"));
+    expect(state.unlockedScenes).to.deep.equal([bru.getVar("startScene")]);
+  });
+
+  test("rien n'est encore découvert", function () {
+    const state = res.getBody().state;
+    expect(state.clues).to.deep.equal([]);
+    expect(state.flags).to.deep.equal([]);
+    expect(state.inventory).to.deep.equal([]);
+    expect(state.seenDialogueNodes).to.deep.equal([]);
+  });
+}
