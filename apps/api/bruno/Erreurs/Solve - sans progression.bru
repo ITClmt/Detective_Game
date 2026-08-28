@@ -1,0 +1,39 @@
+meta {
+  name: Solve - sans progression
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/cases/{{caseSlug}}/solve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "culprit": "camille",
+    "motive": "denonciation",
+    "method": "insuline"
+  }
+}
+
+tests {
+  // Dépend de l'ordre des dossiers : `Erreurs` (seq 3) tourne avant `Cases`
+  // (seq 5), et l'utilisateur créé par `Auth/Register` n'a donc encore aucune
+  // ligne `player_cases` — les requêtes de progression de ce dossier échouent
+  // toutes à la validation et n'en créent pas. Déplacer ce fichier dans
+  // `Cases` le ferait passer en 200.
+  test("répond 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("code PROGRESS_NOT_FOUND", function () {
+    expect(res.getBody().error.code).to.equal("PROGRESS_NOT_FOUND");
+  });
+}

@@ -1,0 +1,39 @@
+meta {
+  name: Solve - 3 sur 3
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/cases/{{caseSlug}}/solve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "culprit": "camille",
+    "motive": "denonciation",
+    "method": "insuline"
+  }
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("score plein", function () {
+    expect(res.getBody().score).to.equal(3);
+  });
+
+  test("renvoie la fin correspondante", function () {
+    expect(res.getBody().ending.title).to.equal("Dossier clos");
+    expect(res.getBody().ending.text).to.be.a("string");
+  });
+}

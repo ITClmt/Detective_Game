@@ -1,4 +1,5 @@
 import { playerStateSchema } from "@repo/shared/game/state";
+import { resolutionAnswersSchema } from "@repo/shared/schemas/condition.schema";
 import { createFactory } from "hono/factory";
 import { jsonValidator } from "../../lib/validator";
 import type { AuthEnv } from "../../middlewares/auth.middleware";
@@ -39,4 +40,16 @@ const saveProgress = factory.createHandlers(
 	},
 );
 
-export default { getBySlug, getProgress, saveProgress };
+const solveCase = factory.createHandlers(
+	requireAuth,
+	jsonValidator(resolutionAnswersSchema),
+	async (c) => {
+		const slug = c.req.param("slug");
+		const user = c.get("user");
+
+		const result = await casesService.solve(user, slug, c.req.valid("json"));
+		return c.json(result);
+	},
+);
+
+export default { getBySlug, getProgress, saveProgress, solveCase };

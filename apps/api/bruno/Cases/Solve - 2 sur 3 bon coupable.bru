@@ -1,0 +1,48 @@
+meta {
+  name: Solve - 2 sur 3 bon coupable
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/cases/{{caseSlug}}/solve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+}
+
+body:json {
+  {
+    "culprit": "camille",
+    "motive": "assurance",
+    "method": "insuline"
+  }
+}
+
+tests {
+  // Cette requête suit un solve déjà réussi : rejouer la résolution est
+  // permis, seule la date du premier succès est figée côté base (invariant
+  // non observable depuis l'API, `solved_at` n'étant pas renvoyé).
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("bon coupable, mauvais mobile", function () {
+    expect(res.getBody().score).to.equal(2);
+  });
+
+  test("matchAnswers l'emporte sur le catch-all du même score", function () {
+    // Deux fins portent score 2. Celle qui cible `culprit: camille` doit
+    // gagner sur celle sans `matchAnswers`, qui n'est que le dernier recours.
+    expect(res.getBody().ending.title).to.equal("Dossier recevable");
+  });
+
+  test("ne renvoie pas les bonnes réponses", function () {
+    expect(res.getBody()).to.not.have.property("answers");
+    expect(res.getBody()).to.not.have.property("solution");
+  });
+}

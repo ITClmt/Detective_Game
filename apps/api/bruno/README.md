@@ -34,7 +34,7 @@ Les dossiers sont numérotés et **l'ordre compte** :
 | `Auth` | le parcours nominal, de l'inscription au logout |
 | `Erreurs` | les rejets attendus (400 / 401 / 404 / 409) |
 | `Securite` | rotation du refresh et détection de rejeu |
-| `Cases` | lecture d'une enquête publiée, et sa progression joueur |
+| `Cases` | lecture d'une enquête, progression joueur, résolution |
 
 `Auth/Register` génère un email unique à chaque exécution (`sherlock+<timestamp>`),
 donc la collection est rejouable sans vider la base entre deux runs. Les
@@ -55,13 +55,30 @@ avant. Le repository de `cases` filtre `is_published: true` : si l'enquête
 seedée est en brouillon (`case.isPublished: false` dans le JSON), ce test
 échoue en 404 — c'est attendu, pas un bug de la collection.
 
-Le dossier `Cases` est un scénario ordonné, pas quatre requêtes indépendantes :
-`Get by slug` publie `startScene` en variable runtime (lue dans la réponse
-plutôt que codée en dur, le contenu n'étant pas versionné), puis
+Le dossier `Cases` est un scénario ordonné, pas une poignée de requêtes
+indépendantes : `Get by slug` publie `startScene` en variable runtime (lue dans
+la réponse plutôt que codée en dur, le contenu n'étant pas versionné), puis
 `Get progress` → `Save progress` → `Get progress après sauvegarde` vérifient le
-cycle création / écriture / relecture. Le dernier test tient parce que
-`Auth/Register` crée un utilisateur neuf à chaque run : sa ligne `player_cases`
-n'existe pas encore, donc le premier `GET` doit bien renvoyer l'état de départ.
+cycle création / écriture / relecture, et les trois `Solve` closent l'enquête.
+Ça tient parce que `Auth/Register` crée un utilisateur neuf à chaque run : sa
+ligne `player_cases` n'existe pas encore, donc le premier `GET` doit bien
+renvoyer l'état de départ.
+
+Deux dépendances d'ordre à connaître avant de déplacer un fichier :
+
+- `Erreurs/Solve - sans progression` attend un `404 PROGRESS_NOT_FOUND`, ce qui
+  n'est vrai que tant que `Erreurs` (seq 3) tourne **avant** `Cases` (seq 5) :
+  l'utilisateur n'a alors aucune ligne de progression. Dans `Cases`, la même
+  requête répondrait 200.
+- `Cases/Solve - 2 sur 3 …` s'exécutent après un solve déjà réussi. Rejouer la
+  résolution est permis ; seule la date du premier succès est figée en base
+  (`WHERE solved_at IS NULL`), invariant non observable depuis l'API puisque
+  `solved_at` n'est pas renvoyé.
+
+La paire `Solve - 2 sur 3 bon coupable` / `Solve - 2 sur 3 mauvais coupable` est
+la plus utile de la collection : même score, deux fins différentes. Elle
+verrouille `pickEnding()` dans les deux sens — `matchAnswers` gagne quand il
+matche, le catch-all du même score sort sinon.
 
 ## Le cookie de refresh
 

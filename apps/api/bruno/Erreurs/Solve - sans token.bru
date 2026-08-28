@@ -1,0 +1,33 @@
+meta {
+  name: Solve - sans token
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/cases/{{caseSlug}}/solve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "culprit": "camille",
+    "motive": "denonciation",
+    "method": "insuline"
+  }
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code MISSING_ACCESS_TOKEN", function () {
+    expect(res.getBody().error.code).to.equal("MISSING_ACCESS_TOKEN");
+  });
+}
