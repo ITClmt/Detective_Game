@@ -32,6 +32,15 @@ export interface PlayerState {
 	unlockedScenes: string[];
 	/** Scène où le joueur reprendra la partie. */
 	currentSceneId: string;
+	/**
+	 * Sujets de dialogue déjà joués, en `${characterId}.${nodeId}`.
+	 *
+	 * Le front s'en sert pour griser sans interdire : une option déjà jouée
+	 * reste cliquable, elle est seulement signalée. Attention, la cible
+	 * `dialogue.start` est le retour au menu et ne doit jamais être grisée —
+	 * elle entre pourtant dans cette liste dès le premier aller-retour.
+	 */
+	seenDialogueNodes: string[];
 }
 
 export const playerStateSchema = z.strictObject({
@@ -40,6 +49,7 @@ export const playerStateSchema = z.strictObject({
 	inventory: z.array(z.string().min(1)),
 	unlockedScenes: z.array(z.string().min(1)),
 	currentSceneId: z.string().min(1),
+	seenDialogueNodes: z.array(z.string().min(1)),
 });
 
 /** État d'entrée d'une enquête : rien de découvert, sur la scène de départ. */
@@ -50,5 +60,6 @@ export function createPlayerState(startSceneId: string): PlayerState {
 		inventory: [],
 		unlockedScenes: [startSceneId],
 		currentSceneId: startSceneId,
+		seenDialogueNodes: [],
 	};
 }

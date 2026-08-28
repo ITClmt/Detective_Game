@@ -173,3 +173,31 @@ export function applyEffects(
 function pushUnique(list: string[], value: string): void {
 	if (!list.includes(value)) list.push(value);
 }
+
+/**
+ * Clé d'un sujet de dialogue. Centralisée ici pour que le front et la
+ * sauvegarde ne puissent pas diverger sur le séparateur — un `.` d'un côté et
+ * un `:` de l'autre feraient cesser le grisage sans lever d'erreur.
+ */
+export function dialogueNodeKey(characterId: string, nodeId: string): string {
+	return `${characterId}.${nodeId}`;
+}
+
+export function hasSeenNode(
+	state: PlayerState,
+	characterId: string,
+	nodeId: string,
+): boolean {
+	return state.seenDialogueNodes.includes(dialogueNodeKey(characterId, nodeId));
+}
+
+/** Marque un nœud comme joué, sans muter l'état reçu (cf. `applyEffects`). */
+export function markNodeSeen(
+	state: PlayerState,
+	characterId: string,
+	nodeId: string,
+): PlayerState {
+	const next = { ...state, seenDialogueNodes: [...state.seenDialogueNodes] };
+	pushUnique(next.seenDialogueNodes, dialogueNodeKey(characterId, nodeId));
+	return next;
+}
