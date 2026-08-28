@@ -22,7 +22,76 @@ Le contenu narratif est pensé pour tenir dans **un JSON par histoire** (scènes
 personnages, dialogues, conditions de déblocage), le moteur se contentant de
 l'interpréter. Cette piste est retenue mais **pas encore implémentée** : ni le
 format, ni le moteur de scènes, ni le modèle de progression n'existent dans le
-code aujourd'hui.
+code aujourd'hui. Un premier jet complet vit dans
+[content/verdier.json](content/verdier.json), pour explorer la forme avant de
+la figer en schéma.
+
+Un piège déjà identifié en écrivant ce premier JSON, à trancher explicitement
+quand le schéma Zod du moteur se conçoit : la clé `when` n'a pas la même
+sémantique selon où elle apparaît. Sur les `branches` d'un hotspot, la
+convention est « première branche dont le `when` matche, sinon celle sans
+`when` en dernier » — un ordre exclusif. Sur les `options` d'un dialogue,
+toutes celles dont le `when` matche s'affichent — un filtre additif. Mélanger
+les deux sans le documenter produit des options dupliquées à l'écran (vécu sur
+`sofia_studio` / nœud `interphone`). La grammaire de conditions elle-même
+(`hasClue`, `hasFlag`, `clueCount`, `all`) manque de `any` et de `not` — ils
+finiront par être nécessaires, autant les prévoir dans le schéma dès le
+départ plutôt que les ajouter au coup par coup.
+
+Troisième sémantique, distincte des deux précédentes : les `endings` de
+`resolution` ont besoin de sélectionner un texte selon la **réponse** donnée
+par le joueur (`culprit`, `motive`, `method`), pas selon l'état de partie
+(clues/flags) qu'évalue `when` partout ailleurs. C'est un espace de noms qui
+n'existe même pas pendant l'exploration — un évaluateur unique appliqué
+naïvement à `when` sur les trois structures planterait ou renverrait `false`
+en silence sur celle-ci. D'où une clé distincte, `matchAnswers`, réservée aux
+`endings` :
+
+```json
+{ "score": 2, "matchAnswers": { "culprit": "camille" }, ... }
+```
+
+Le contenu actuel utilise déjà les trois — `when` exclusif sur les branches,
+`when` additif sur les options de dialogue, `matchAnswers` sur les endings —
+et le moteur devra les distinguer explicitement dans son évaluateur, pas les
+faire converger sur une seule fonction générique.
+
+Choix d'art retenu : un personnage optionnellement présent dans une scène
+(Camille, absente du duplex une fois l'hôpital débloqué) se traduit par une
+**planche de fond différente**, pas par un sprite superposé au runtime. Un
+sprite ne peut pas se placer derrière un élément de décor (comptoir, meuble),
+alors qu'une planche dédiée le peut nativement. Le coût en images reste
+maîtrisable tant que les scènes futures limitent le nombre de personnages
+simultanément conditionnels — au-delà, le nombre de planches explose en 2ⁿ.
+`scenes[].background` accepte donc soit une chaîne (fond fixe), soit un
+tableau de branches `{ when, image }` avec la même convention que les
+hotspots — première branche dont le `when` matche, sinon celle sans `when`.
+
+Les mécaniques d'interaction (le joueur doit *faire* quelque chose — taper un
+code, pas juste avoir vu un indice) passent par un effet générique
+`interaction`, plutôt qu'un verbe d'effet ad hoc par mécanique :
+
+```json
+{
+  "interaction": {
+    "action": "input",
+    "prompt": "L'écran réclame un code à quatre chiffres.",
+    "params": { "kind": "number", "length": 4, "answer": "1403" },
+    "onSuccess": [{ "showText": "..." }, { "addClue": "..." }],
+    "onFailure": [{ "showText": "..." }]
+  }
+}
+```
+
+`action` est le seul champ que le moteur doit connaître à l'avance — il
+sélectionne le composant à monter (`{ input: InputWidget, ... }` côté front).
+`params` est libre, propre à chaque `action` (`kind`/`length`/`answer` pour
+`input`, autre chose pour une future serrure à combinaison). `onSuccess` /
+`onFailure` restent dans le même vocabulaire d'effets que partout ailleurs
+(`showText`, `addClue`...) — la résolution succès/échec ne se réinvente pas à
+chaque mécanique, seul le rendu de la mécanique elle-même varie. Une nouvelle
+enquête avec une mécanique différente ajoute une valeur d'`action` et un
+composant, jamais un nouveau verbe d'effet au niveau racine.
 
 État réel du dépôt : seule l'authentification est écrite (register / login /
 refresh / logout / me). Le domaine de jeu — enquêtes, scènes, progression du
