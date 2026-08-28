@@ -10,7 +10,16 @@
 		"./*": "./src/*.ts",
 		"./*.ts": "./src/*.ts"
 	},
+	"scripts": {
+		"test:unit": "vitest",
+		"type-check": "tsc --noEmit"
+	},
 	"dependencies": {
 		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@types/node": "^24.13.3",
+		"typescript": "~6.0.0",
+		"vitest": "^4.1.10"
 	}
 }
