@@ -117,7 +117,7 @@ describe("pickFirstMatch — sémantique EXCLUSIVE", () => {
 		const partial = stateWith({ clues: ["clue_planning_hospitalier"] });
 		const complete = stateWith({
 			clues: ["clue_planning_hospitalier"],
-			flags: ["temoignage_sofia"],
+			flags: ["temoignage_laya"],
 		});
 
 		expect(
@@ -134,10 +134,10 @@ describe("filterAllMatches — sémantique ADDITIVE", () => {
 		// Le cas qui a servi de contre-exemple : sur `interphone`, l'option
 		// conditionnelle s'ajoute à l'option inconditionnelle, elle ne la
 		// remplace pas.
-		const without = visibleOptions(stateWith({}), "sofia_studio", "interphone");
+		const without = visibleOptions(stateWith({}), "laya_studio", "interphone");
 		const with_ = visibleOptions(
 			stateWith({ clues: ["clue_lettre_licenciement"] }),
-			"sofia_studio",
+			"laya_studio",
 			"interphone",
 		);
 
@@ -264,7 +264,7 @@ describe("pickEnding", () => {
 				"Intuition seule",
 			],
 			[
-				{ culprit: "sofia", motive: "vengeance", method: "insuline" },
+				{ culprit: "laya", motive: "vengeance", method: "insuline" },
 				"Affaire reclassée",
 			],
 			[

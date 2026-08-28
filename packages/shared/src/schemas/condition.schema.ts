@@ -21,7 +21,7 @@ import z from "zod";
  *    « toutes les options dont le `when` matche s'affichent simultanément ;
  *    une option sans `when` s'affiche toujours ». Zéro à N entrées retenues.
  *    → moteur : `filterAllMatches()`
- *    C'est le piège vécu sur `sofia_studio` / nœud `interphone` : appliquer
+ *    C'est le piège vécu sur `laya_studio` / nœud `interphone` : appliquer
  *    ici la sémantique exclusive fait disparaître des options, l'appliquer
  *    ailleurs les duplique.
  *

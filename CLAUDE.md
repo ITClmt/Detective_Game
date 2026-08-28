@@ -33,7 +33,7 @@ convention est « première branche dont le `when` matche, sinon celle sans
 `when` en dernier » — un ordre exclusif. Sur les `options` d'un dialogue,
 toutes celles dont le `when` matche s'affichent — un filtre additif. Mélanger
 les deux sans le documenter produit des options dupliquées à l'écran (vécu sur
-`sofia_studio` / nœud `interphone`). La grammaire de conditions elle-même
+`laya_studio` / nœud `interphone`). La grammaire de conditions elle-même
 (`hasClue`, `hasFlag`, `clueCount`, `all`) manque de `any` et de `not` — ils
 finiront par être nécessaires, autant les prévoir dans le schéma dès le
 départ plutôt que les ajouter au coup par coup.

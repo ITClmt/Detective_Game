@@ -150,7 +150,7 @@ describe("parcours complet — affaire Verdier", () => {
 			"hs_ordinateur_nicolas",
 			"hs_classeur_comptable",
 			"hs_bureau_yann",
-			"hs_casier_sofia",
+			"hs_casier_laya",
 			"hs_interphone",
 		]) {
 			state = clickHotspot(state, "studio", hotspotId).state;
@@ -159,13 +159,13 @@ describe("parcours complet — affaire Verdier", () => {
 		expect(state.flags).toContain("sait_dettes_yann");
 		expect(state.clues).toHaveLength(10);
 
-		// Sofia : son témoignage n'arrive qu'après l'interphone ET le
+		// Laya : son témoignage n'arrive qu'après l'interphone ET le
 		// licenciement — deux indices, deux options qui s'empilent.
-		state = clickHotspot(state, "studio", "hs_parler_sofia").state;
-		state = enterNode(state, "sofia_studio", "accueil");
-		state = chooseGoto(state, "sofia_studio", "accueil", "interphone");
-		state = chooseGoto(state, "sofia_studio", "interphone", "temoignage");
-		expect(state.flags).toContain("temoignage_sofia");
+		state = clickHotspot(state, "studio", "hs_parler_laya").state;
+		state = enterNode(state, "laya_studio", "accueil");
+		state = chooseGoto(state, "laya_studio", "accueil", "interphone");
+		state = chooseGoto(state, "laya_studio", "interphone", "temoignage");
+		expect(state.flags).toContain("temoignage_laya");
 
 		// Il manque encore le registre : la résolution reste fermée.
 		expect(

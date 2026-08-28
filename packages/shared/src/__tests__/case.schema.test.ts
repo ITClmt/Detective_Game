@@ -57,7 +57,7 @@ describe("conditionSchema", () => {
 	it("accepte les sept opérateurs, `any` et `not` compris", () => {
 		const conditions = [
 			{ hasClue: "clue_verre_vin" },
-			{ hasFlag: "temoignage_sofia" },
+			{ hasFlag: "temoignage_laya" },
 			{ hasItem: "item_stylo_insuline" },
 			{ clueCount: { gte: 10 } },
 			{ all: [{ hasClue: "a" }, { hasFlag: "b" }] },
