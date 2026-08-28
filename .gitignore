@@ -10,3 +10,7 @@ node_modules/
 
 # OS
 .DS_Store
+
+# contenu narratif des enquêtes — pas publié dans le repo public,
+# reste en local comme fixture pour les tests de packages/shared
+content/
