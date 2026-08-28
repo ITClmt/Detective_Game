@@ -1,0 +1,30 @@
+meta {
+  name: Get by slug
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/cases/{{caseSlug}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("renvoie l'enquête demandée", function () {
+    expect(res.getBody().case.slug).to.equal("chute-nicolas-verdier");
+    expect(res.getBody().content).to.have.property("scenes");
+  });
+
+  test("ne fuite jamais la solution", function () {
+    expect(res.getBody()).to.not.have.property("solution");
+  });
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Case - slug inconnu
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/cases/slug-qui-nexiste-pas
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("code CASE_NOT_FOUND", function () {
+    expect(res.getBody().error.code).to.equal("CASE_NOT_FOUND");
+  });
+}

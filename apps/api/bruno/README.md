@@ -1,14 +1,17 @@
 # Collection Bruno — Triviani Detective API
 
 Couvre l'intégralité du flow d'auth : register, login, route protégée,
-rotation du refresh, logout, les cas d'erreur et la détection de rejeu.
+rotation du refresh, logout, les cas d'erreur et la détection de rejeu. Couvre
+aussi la lecture d'une enquête (`GET /cases/:slug`).
 
 ## Lancer
 
-Il faut la base et l'API debout :
+Il faut la base, le contenu seedé et l'API debout :
 
 ```bash
 docker compose up -d db
+bun run --cwd apps/api db:migrate
+bun run --cwd apps/api db:seed
 bun run --cwd apps/api dev
 ```
 
@@ -29,8 +32,9 @@ Les dossiers sont numérotés et **l'ordre compte** :
 |---|---|
 | `Health` | l'API répond |
 | `Auth` | le parcours nominal, de l'inscription au logout |
-| `Erreurs` | les rejets attendus (400 / 401 / 409) |
+| `Erreurs` | les rejets attendus (400 / 401 / 404 / 409) |
 | `Securite` | rotation du refresh et détection de rejeu |
+| `Cases` | lecture d'une enquête publiée par son slug |
 
 `Auth/Register` génère un email unique à chaque exécution (`sherlock+<timestamp>`),
 donc la collection est rejouable sans vider la base entre deux runs. Les
@@ -39,11 +43,17 @@ lancer `Login` seul sans avoir lancé `Register` avant ne marchera pas.
 
 ## Variables
 
-`environments/Local.bru` ne contient que ce qui est stable : `host`, `baseUrl`
-et le mot de passe de test. Tout le reste (`accessToken`, `testEmail`, `userId`,
-les valeurs de refresh) passe par des **variables runtime** (`bru.setVar`), qui
-ne sont pas écrites dans le fichier d'environnement — sinon l'UI Bruno
-commiterait des tokens à chaque run.
+`environments/Local.bru` ne contient que ce qui est stable : `host`, `baseUrl`,
+le mot de passe de test et `caseSlug` (le slug de l'enquête seedée en local via
+`db:seed`, à faire correspondre à `content/verdier.json` — non versionné). Tout
+le reste (`accessToken`, `testEmail`, `userId`, les valeurs de refresh) passe
+par des **variables runtime** (`bru.setVar`), qui ne sont pas écrites dans le
+fichier d'environnement — sinon l'UI Bruno commiterait des tokens à chaque run.
+
+`Cases/Get by slug` s'appuie sur `accessToken`, donc `Auth` doit avoir tourné
+avant. Le repository de `cases` filtre `is_published: true` : si l'enquête
+seedée est en brouillon (`case.isPublished: false` dans le JSON), ce test
+échoue en 404 — c'est attendu, pas un bug de la collection.
 
 ## Le cookie de refresh
 
