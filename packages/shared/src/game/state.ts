@@ -1,8 +1,9 @@
 import z from "zod";
 
 /**
- * État d'une partie — ce qui vit dans la ligne `player_cases` (colonnes ou
- * `jsonb`, la table reste à concevoir).
+ * État d'une partie — ce que stocke la colonne `jsonb` `player_cases.state`
+ * (voir `apps/api/src/db/schema/playerCases.ts`), revalidé avec
+ * `playerStateSchema` à chaque relecture par `GET /cases/:slug/progress`.
  *
  * C'est le seul espace de noms qu'évalue `evaluateCondition()`. Les réponses
  * de résolution n'en font PAS partie : elles n'existent qu'au moment de la

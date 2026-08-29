@@ -17,8 +17,14 @@ import { effectSchema } from "./effect.schema";
  *  - `content`  : tout ce que le joueur peut voir — scènes, indices, objets,
  *                 personnages, dialogues, résolution ;
  *  - `solution` : les bonnes réponses et les fins. Le jeu est solo et sans
- *                 classement, donc pas de filtrage côté serveur : le front
- *                 reçoit tout le JSON, y compris ce bloc.
+ *                 classement, donc pas de *revalidation métier* côté serveur
+ *                 (l'API ne vérifie jamais `resolution.unlockWhen` avant
+ *                 d'accepter une résolution). Ce bloc reste néanmoins retenu
+ *                 côté serveur : `GET /cases/:slug` le retire via
+ *                 `stripSolution()` (voir `game/public.ts`), sans quoi
+ *                 n'importe qui ouvrant l'onglet Réseau verrait le coupable
+ *                 avant d'avoir cliqué un seul hotspot. Seule
+ *                 `POST /cases/:slug/solve` le lit, côté serveur.
  *
  * Tous les objets sont `strict` : une clé inconnue est une faute de frappe
  * d'auteur, pas une extension. Le format évolue par le schéma, pas par le

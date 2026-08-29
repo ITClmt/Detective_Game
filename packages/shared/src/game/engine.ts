@@ -11,8 +11,11 @@ import type { PlayerState } from "./state";
 /**
  * Moteur de jeu : lit le JSON d'une enquête et l'état de progression du
  * joueur, en déduit ce qu'il faut afficher. C'est le front qui l'utilise, à
- * chaque clic — le back ne fait que stocker le `PlayerState` que le front lui
- * envoie, il ne rejoue rien de ce fichier.
+ * chaque clic — le back ne rejoue jamais `evaluateCondition`/`applyEffects` :
+ * il se contente de stocker le `PlayerState` que le front lui envoie. Seule
+ * exception, à la résolution : `apps/api` importe directement
+ * `scoreAnswers`/`pickEnding` de ce fichier, parce que `solution` (les bonnes
+ * réponses) ne doit jamais partir côté client — voir `case.schema.ts`.
  *
  * Le format utilise le même type `Condition` à trois endroits différents,
  * mais avec trois sens différents. Les confondre ne plante pas, ça produit un
