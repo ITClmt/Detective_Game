@@ -9,18 +9,24 @@ import {
 	matchAnswersSchema,
 } from "../schemas/condition.schema";
 import { effectSchema } from "../schemas/effect.schema";
-import { readVerdierJson } from "./verdier-json";
+import { readVerdierJson, verdierFixtureExists } from "./verdier-json";
 
 describe("caseFileSchema", () => {
-	it("valide content/verdier.json sans écart", () => {
-		const result = caseFileSchema.safeParse(readVerdierJson());
+	// `content/verdier.json` est gitignoré : sur un clone qui ne l'a pas
+	// (CI, nouveau poste), ce test n'a rien à valider — il se déclare `skip`
+	// au lieu de faire mourir tout le fichier sur un `readFileSync` qui lève.
+	it.skipIf(!verdierFixtureExists)(
+		"valide content/verdier.json sans écart",
+		() => {
+			const result = caseFileSchema.safeParse(readVerdierJson());
 
-		// On imprime les écarts plutôt qu'un simple `false` : sur un JSON de mille
-		// lignes, l'assertion nue ne dit pas où regarder.
-		expect(
-			result.success ? [] : result.error.issues.map(formatIssue),
-		).toStrictEqual([]);
-	});
+			// On imprime les écarts plutôt qu'un simple `false` : sur un JSON de
+			// mille lignes, l'assertion nue ne dit pas où regarder.
+			expect(
+				result.success ? [] : result.error.issues.map(formatIssue),
+			).toStrictEqual([]);
+		},
+	);
 
 	it("refuse une clé inconnue (faute de frappe d'auteur)", () => {
 		const hotspot = {
@@ -33,11 +39,14 @@ describe("caseFileSchema", () => {
 		expect(hotspotSchema.safeParse(hotspot).success).toBe(false);
 	});
 
-	it("refuse un schemaVersion autre que 1", () => {
-		const bumped = { ...(readVerdierJson() as object), schemaVersion: 2 };
+	it.skipIf(!verdierFixtureExists)(
+		"refuse un schemaVersion autre que 1",
+		() => {
+			const bumped = { ...(readVerdierJson() as object), schemaVersion: 2 };
 
-		expect(caseFileSchema.safeParse(bumped).success).toBe(false);
-	});
+			expect(caseFileSchema.safeParse(bumped).success).toBe(false);
+		},
+	);
 
 	it("refuse une option de dialogue qui est à la fois goto et end", () => {
 		expect(

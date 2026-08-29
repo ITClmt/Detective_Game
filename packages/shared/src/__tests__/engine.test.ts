@@ -19,6 +19,7 @@ import {
 	verdier,
 	visibleOptions,
 } from "./fixture";
+import { verdierFixtureExists } from "./verdier-json";
 
 function stateWith(partial: Partial<PlayerState>): PlayerState {
 	return { ...createPlayerState("duplex"), ...partial };
@@ -112,43 +113,53 @@ describe("pickFirstMatch — sémantique EXCLUSIVE", () => {
 		expect(pickFirstMatch(conditional, stateWith({}))).toBeUndefined();
 	});
 
-	it("n'ouvre la confrontation de Camille qu'avec planning + témoignage", () => {
-		const hotspot = findHotspot("hopital", "hs_confronter_camille");
-		const partial = stateWith({ clues: ["clue_planning_hospitalier"] });
-		const complete = stateWith({
-			clues: ["clue_planning_hospitalier"],
-			flags: ["temoignage_laya"],
-		});
+	it.skipIf(!verdierFixtureExists)(
+		"n'ouvre la confrontation de Camille qu'avec planning + témoignage",
+		() => {
+			const hotspot = findHotspot("hopital", "hs_confronter_camille");
+			const partial = stateWith({ clues: ["clue_planning_hospitalier"] });
+			const complete = stateWith({
+				clues: ["clue_planning_hospitalier"],
+				flags: ["temoignage_laya"],
+			});
 
-		expect(
-			pickFirstMatch(hotspot.branches, partial)?.effects[0],
-		).not.toHaveProperty("startDialogue");
-		expect(
-			pickFirstMatch(hotspot.branches, complete)?.effects[0],
-		).toStrictEqual({ startDialogue: "camille_confrontation" });
-	});
+			expect(
+				pickFirstMatch(hotspot.branches, partial)?.effects[0],
+			).not.toHaveProperty("startDialogue");
+			expect(
+				pickFirstMatch(hotspot.branches, complete)?.effects[0],
+			).toStrictEqual({ startDialogue: "camille_confrontation" });
+		},
+	);
 });
 
 describe("filterAllMatches — sémantique ADDITIVE", () => {
-	it("affiche toutes les options qui matchent, sans doublon ni disparition", () => {
-		// Le cas qui a servi de contre-exemple : sur `interphone`, l'option
-		// conditionnelle s'ajoute à l'option inconditionnelle, elle ne la
-		// remplace pas.
-		const without = visibleOptions(stateWith({}), "laya_studio", "interphone");
-		const with_ = visibleOptions(
-			stateWith({ clues: ["clue_lettre_licenciement"] }),
-			"laya_studio",
-			"interphone",
-		);
+	it.skipIf(!verdierFixtureExists)(
+		"affiche toutes les options qui matchent, sans doublon ni disparition",
+		() => {
+			// Le cas qui a servi de contre-exemple : sur `interphone`, l'option
+			// conditionnelle s'ajoute à l'option inconditionnelle, elle ne la
+			// remplace pas.
+			const without = visibleOptions(
+				stateWith({}),
+				"laya_studio",
+				"interphone",
+			);
+			const with_ = visibleOptions(
+				stateWith({ clues: ["clue_lettre_licenciement"] }),
+				"laya_studio",
+				"interphone",
+			);
 
-		expect(optionTexts(without)).toStrictEqual([
-			"Je ne vous accuse de rien. Pour l'instant.",
-		]);
-		expect(optionTexts(with_)).toStrictEqual([
-			"Je veux surtout savoir ce que vous avez vu.",
-			"Je ne vous accuse de rien. Pour l'instant.",
-		]);
-	});
+			expect(optionTexts(without)).toStrictEqual([
+				"Je ne vous accuse de rien. Pour l'instant.",
+			]);
+			expect(optionTexts(with_)).toStrictEqual([
+				"Je veux surtout savoir ce que vous avez vu.",
+				"Je ne vous accuse de rien. Pour l'instant.",
+			]);
+		},
+	);
 
 	it("renvoie un tableau vide quand rien ne matche", () => {
 		const list = [{ when: { hasFlag: "absent" }, tag: "x" }];
@@ -236,11 +247,14 @@ describe("matchAnswers — sémantique RÉPONSES", () => {
 	});
 });
 
+// `describe.skipIf` ne suffit pas seul : le corps du `describe` s'exécute
+// pendant la collecte des tests que la fixture existe ou non — seul le corps
+// d'un `it.skipIf` est réellement sauté à l'exécution. D'où `verdier.solution`
+// lu dans chaque `it`, jamais au niveau du `describe`.
 describe("pickEnding", () => {
-	const solution = verdier.solution;
-	const right = solution.answers;
+	it.skipIf(!verdierFixtureExists)("compte les bonnes réponses", () => {
+		const right = verdier.solution.answers;
 
-	it("compte les bonnes réponses", () => {
 		expect(scoreAnswers(right, right)).toBe(3);
 		expect(scoreAnswers(right, { ...right, method: "poussee" })).toBe(2);
 		expect(
@@ -252,34 +266,39 @@ describe("pickEnding", () => {
 		).toBe(0);
 	});
 
-	it("choisit la fin par score puis par matchAnswers", () => {
-		const cases: Array<[ResolutionAnswers, string]> = [
-			[right, "Dossier clos"],
-			// 2/3 avec le bon coupable, et 2/3 sans : le score seul ne suffit pas
-			// à trancher, d'où le second étage.
-			[{ ...right, method: "poussee" }, "Dossier recevable"],
-			[{ ...right, culprit: "yann" }, "Mauvaise cible"],
-			[
-				{ culprit: "camille", motive: "assurance", method: "poussee" },
-				"Intuition seule",
-			],
-			[
-				{ culprit: "laya", motive: "vengeance", method: "insuline" },
-				"Affaire reclassée",
-			],
-			[
-				{ culprit: "yann", motive: "assurance", method: "poussee" },
-				"Erreur judiciaire",
-			],
-		];
+	it.skipIf(!verdierFixtureExists)(
+		"choisit la fin par score puis par matchAnswers",
+		() => {
+			const solution = verdier.solution;
+			const right = solution.answers;
+			const cases: Array<[ResolutionAnswers, string]> = [
+				[right, "Dossier clos"],
+				// 2/3 avec le bon coupable, et 2/3 sans : le score seul ne suffit pas
+				// à trancher, d'où le second étage.
+				[{ ...right, method: "poussee" }, "Dossier recevable"],
+				[{ ...right, culprit: "yann" }, "Mauvaise cible"],
+				[
+					{ culprit: "camille", motive: "assurance", method: "poussee" },
+					"Intuition seule",
+				],
+				[
+					{ culprit: "laya", motive: "vengeance", method: "insuline" },
+					"Affaire reclassée",
+				],
+				[
+					{ culprit: "yann", motive: "assurance", method: "poussee" },
+					"Erreur judiciaire",
+				],
+			];
 
-		for (const [given, expected] of cases) {
-			expect(pickEnding(solution, given)?.ending.title).toBe(expected);
-		}
-	});
+			for (const [given, expected] of cases) {
+				expect(pickEnding(solution, given)?.ending.title).toBe(expected);
+			}
+		},
+	);
 });
 
-describe("resolveBackground", () => {
+describe.skipIf(!verdierFixtureExists)("resolveBackground", () => {
 	it("renvoie la chaîne telle quelle sur un fond fixe", () => {
 		const studio = findScene("studio");
 		if (typeof studio.background !== "string") {

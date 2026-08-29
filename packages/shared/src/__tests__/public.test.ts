@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { stripSolution } from "../game/public";
 import { verdier } from "./fixture";
+import { verdierFixtureExists } from "./verdier-json";
 
-describe("stripSolution", () => {
+// Dépend de `content/verdier.json`, gitignoré — voir verdier-json.ts.
+describe.skipIf(!verdierFixtureExists)("stripSolution", () => {
 	it("retire `solution` et rien d'autre", () => {
 		const preview = stripSolution(verdier);
 

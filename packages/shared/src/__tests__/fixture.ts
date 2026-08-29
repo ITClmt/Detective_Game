@@ -10,7 +10,7 @@ import type {
 } from "../schemas/case.schema";
 import { parseCaseFile } from "../schemas/case.schema";
 import type { Effect } from "../schemas/effect.schema";
-import { readVerdierJson } from "./verdier-json";
+import { readVerdierJson, verdierFixtureExists } from "./verdier-json";
 
 /**
  * `content/verdier.json` sert de fixture principale : c'est le seul contenu
@@ -18,8 +18,16 @@ import { readVerdierJson } from "./verdier-json";
  * sémantiques d'évaluation. Tester contre lui plutôt que contre des objets
  * fabriqués évite d'écrire des tests qui valident une idée du format au lieu
  * du format.
+ *
+ * `undefined` (via ce cast) quand le fichier est absent — jamais lu dans ce
+ * cas en pratique : chaque describe/it qui en dépend est gardé par
+ * `.skipIf(!verdierFixtureExists)`, donc son corps ne s'exécute jamais. Le
+ * cast évite de propager `CaseFile | undefined` dans toute la fixture pour un
+ * cas que les gardes empêchent déjà d'atteindre.
  */
-export const verdier: CaseFile = parseCaseFile(readVerdierJson());
+export const verdier: CaseFile = verdierFixtureExists
+	? parseCaseFile(readVerdierJson())
+	: (undefined as unknown as CaseFile);
 
 export function findScene(sceneId: string): Scene {
 	const scene = verdier.content.scenes.find((entry) => entry.id === sceneId);
