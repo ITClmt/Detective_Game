@@ -1,12 +1,9 @@
 <script setup lang="ts">
+import type { HotspotArea } from "@repo/shared/schemas/case.schema";
+
 defineProps<{
 	label: string;
-	area: {
-		x: number;
-		y: number;
-		w: number;
-		h: number;
-	};
+	area: HotspotArea;
 }>();
 
 const emit = defineEmits<{

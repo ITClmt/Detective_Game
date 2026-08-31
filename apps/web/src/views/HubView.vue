@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Hotspot from "@/components/Hotspot.vue";
+import BaseHotspot from "@/components/ui/BaseHotspot.vue";
 
 const hub = ref({
 	image: "http://s3.itclmt.dev/assets/hub/garage01.webp",
 	description: "Garage",
 	hotspots: [
 		{
-			name: "e-Mail",
+			label: "e-Mail",
 			area: {
 				x: 72.03,
 				y: 44.22,
@@ -37,10 +37,10 @@ function handleMailClick() {
 				class="block h-auto w-auto max-h-[calc(100dvh-2rem)] max-w-[calc(100dvw-5rem)] object-contain"
 			>
 
-			<Hotspot
+			<BaseHotspot
 				v-for="hotspot in hub.hotspots"
-				:key="hotspot.name"
-				:label="hotspot.name"
+				:key="hotspot.label"
+				:label="hotspot.label"
 				:area="hotspot.area"
 				@click="handleMailClick"
 			/>
