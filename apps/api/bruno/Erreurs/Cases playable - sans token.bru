@@ -1,0 +1,21 @@
+meta {
+  name: Cases playable - sans token
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/cases/playable
+  body: none
+  auth: none
+}
+
+tests {
+  test("répond 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("code MISSING_ACCESS_TOKEN", function () {
+    expect(res.getBody().error.code).to.equal("MISSING_ACCESS_TOKEN");
+  });
+}

@@ -52,4 +52,17 @@ const solveCase = factory.createHandlers(
 	},
 );
 
-export default { getBySlug, getProgress, saveProgress, solveCase };
+const getPlayableCases = factory.createHandlers(requireAuth, async (c) => {
+	const user = c.get("user");
+	const cases = await casesService.getPlayableCases(user);
+
+	return c.json(cases);
+});
+
+export default {
+	getBySlug,
+	getProgress,
+	saveProgress,
+	solveCase,
+	getPlayableCases,
+};

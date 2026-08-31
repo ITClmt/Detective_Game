@@ -29,6 +29,20 @@ const casesRepository = {
 		return row;
 	},
 
+	findPublishedCases: async () => {
+		return db
+			.select()
+			.from(casesTable)
+			.where(eq(casesTable.is_published, true));
+	},
+
+	findPlayerCases: async (userId: string) => {
+		return db
+			.select()
+			.from(playerCasesTable)
+			.where(eq(playerCasesTable.user_id, userId));
+	},
+
 	upsertPlayerCase: async (
 		userId: string,
 		caseId: string,

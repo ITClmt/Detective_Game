@@ -1,0 +1,36 @@
+meta {
+  name: Get playable cases
+  type: http
+  seq: 2.5
+}
+
+get {
+  url: {{baseUrl}}/cases/playable
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("renvoie un tableau", function () {
+    expect(res.getBody()).to.be.an("array");
+  });
+
+  test("contient l'enquête en cours, marquée started", function () {
+    const entry = res.getBody().find((c) => c.case.slug === "chute-nicolas-verdier");
+    expect(entry).to.exist;
+    expect(entry.started).to.equal(true);
+  });
+
+  test("ne fuite jamais la solution", function () {
+    const entry = res.getBody().find((c) => c.case.slug === "chute-nicolas-verdier");
+    expect(entry).to.not.have.property("solution");
+  });
+}

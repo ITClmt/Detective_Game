@@ -1,0 +1,26 @@
+meta {
+  name: Get playable cases après résolution
+  type: http
+  seq: 7.5
+}
+
+get {
+  url: {{baseUrl}}/cases/playable
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("l'enquête résolue disparaît de la liste jouable", function () {
+    const entry = res.getBody().find((c) => c.case.slug === "chute-nicolas-verdier");
+    expect(entry).to.be.undefined;
+  });
+}
