@@ -28,7 +28,7 @@ const { mutate, isLoading, error } = useMutation({
 		api<AuthResponse>("/auth/register", { method: "POST", body: params }),
 	onSuccess: (session) => {
 		auth.setSession(session);
-		router.push({ name: "home" });
+		router.push({ name: "hub" });
 	},
 });
 

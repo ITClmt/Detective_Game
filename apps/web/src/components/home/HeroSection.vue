@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAuthStore } from "@/stores/auth.store";
+
+const { isAuthenticated } = useAuthStore();
+</script>
 
 <template
 	><section
@@ -29,10 +33,19 @@
 			</p>
 
 			<RouterLink
+				v-if="!isAuthenticated"
 				:to="{ name: 'register' }"
 				class="inline-flex items-center gap-3 border border-accent bg-accent px-8.5 py-4.5 font-sans font-semibold text-ui tracking-cta text-accent-contrast transition-colors duration-150 hover:border-accent-hover hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-accent-hover focus-visible:outline-offset-[3px]"
 			>
 				COMMENCER L'ENQUÊTE
+				<span class="font-mono text-meta">→</span>
+			</RouterLink>
+			<RouterLink
+				v-else
+				:to="{ name: 'hub' }"
+				class="inline-flex items-center gap-3 border border-accent bg-accent px-8.5 py-4.5 font-sans font-semibold text-ui tracking-cta text-accent-contrast transition-colors duration-150 hover:border-accent-hover hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-accent-hover focus-visible:outline-offset-[3px]"
+			>
+				CONTINUER L'ENQUÊTE
 				<span class="font-mono text-meta">→</span>
 			</RouterLink>
 		</div>

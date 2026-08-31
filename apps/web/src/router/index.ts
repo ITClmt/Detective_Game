@@ -6,6 +6,7 @@ import {
 import { useAuthStore } from "@/stores/auth.store";
 import AuthView from "@/views/AuthView.vue";
 import HomeView from "@/views/HomeView.vue";
+import HubView from "@/views/HubView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 
 declare module "vue-router" {
@@ -29,6 +30,7 @@ const routes: RouteRecordRaw[] = [
 		component: AuthView,
 		meta: { guestOnly: true },
 	},
+	{ path: "/hub", name: "hub", component: HubView },
 	{ path: "/:pathMatch(.*)*", name: "not-found", component: NotFoundView },
 ];
 
