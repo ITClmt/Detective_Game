@@ -17,6 +17,19 @@ test : `content/verdier.json` (non versionné). Back (auth + `cases`) écrit ;
 côté moteur : `isSceneUnlocked()` et `refreshUnlockedScenes()` (rien ne relie
 encore `scene.unlockWhen` à `PlayerState.unlockedScenes`).
 
+**Prototype de bout en bout disponible sur la branche
+`spike/full-loop-prototype`** : hub → mail → scène (fond + hotspots) →
+dialogues, effet `showText`, `interaction`, résolution, changement de scène.
+C'est un spike, pas du code final — à reprendre et améliorer, mais c'est la
+direction/le rendu qu'on suit pour la suite du front (voir
+`apps/web/src/views/SceneView.vue` et `apps/web/src/components/scene/` sur
+cette branche).
+
+TODO : l'outil de debug hotspots du prototype (`HotspotDebugOverlay`, touche
+D en jeu — glisser un rectangle sur le fond affiche x/y/w/h en %, bouton pour
+copier) est à conserver et formaliser en vrai outil d'auteur, pas à perdre en
+reprenant le reste du prototype.
+
 Jeu en phase de conception : sur gameplay/format, proposer et faire valider
 plutôt que trancher seul.
 
