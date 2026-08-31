@@ -13,6 +13,8 @@ declare module "vue-router" {
 	interface RouteMeta {
 		/** Route réservée aux visiteurs non connectés. */
 		guestOnly?: boolean;
+		/** Route réservée aux utilisateurs connectés. */
+		requireAuth?: boolean;
 	}
 }
 
@@ -30,7 +32,12 @@ const routes: RouteRecordRaw[] = [
 		component: AuthView,
 		meta: { guestOnly: true },
 	},
-	{ path: "/hub", name: "hub", component: HubView },
+	{
+		path: "/hub",
+		name: "hub",
+		component: HubView,
+		meta: { requireAuth: true },
+	},
 	{ path: "/:pathMatch(.*)*", name: "not-found", component: NotFoundView },
 ];
 
@@ -60,6 +67,10 @@ router.beforeEach(async (to) => {
 
 	if (to.meta.guestOnly && auth.isAuthenticated) {
 		return { name: "home" };
+	}
+
+	if (to.meta.requireAuth && !auth.isAuthenticated) {
+		return { name: "login" };
 	}
 });
 
