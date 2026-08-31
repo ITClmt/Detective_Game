@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import MailboxModal from "@/components/hub/MailboxModal.vue";
 import BaseHotspot from "@/components/ui/BaseHotspot.vue";
+
+const mailBox = ref(false);
 
 const hub = ref({
 	image: "http://s3.itclmt.dev/assets/hub/garage01.webp",
@@ -19,10 +22,7 @@ const hub = ref({
 });
 
 function handleMailClick() {
-	// TODO: fetch playerCase — pas encore d'endpoint pour lister les enquêtes
-	// d'un joueur (seulement GET /cases/:slug/progress, qui prend déjà un slug
-	// connu). Une fois cet endpoint dispo côté API, appeler `api()` (@/lib/http)
-	// ici pour charger la boîte mail avant de naviguer dessus.
+	mailBox.value = true;
 }
 </script>
 
@@ -45,5 +45,7 @@ function handleMailClick() {
 				@click="handleMailClick"
 			/>
 		</div>
+
+		<MailboxModal v-model:open="mailBox" />
 	</main>
 </template>
