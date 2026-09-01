@@ -8,6 +8,7 @@ import AuthView from "@/views/AuthView.vue";
 import HomeView from "@/views/HomeView.vue";
 import HubView from "@/views/HubView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
+import SceneView from "@/views/SceneView.vue";
 
 declare module "vue-router" {
 	interface RouteMeta {
@@ -36,6 +37,12 @@ const routes: RouteRecordRaw[] = [
 		path: "/hub",
 		name: "hub",
 		component: HubView,
+		meta: { requireAuth: true },
+	},
+	{
+		path: "/case/:slug",
+		name: "case",
+		component: SceneView,
 		meta: { requireAuth: true },
 	},
 	{ path: "/:pathMatch(.*)*", name: "not-found", component: NotFoundView },
