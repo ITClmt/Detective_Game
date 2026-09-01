@@ -1,4 +1,6 @@
-import { defineQuery, useQuery } from "@pinia/colada";
+import { defineQuery, useMutation, useQuery } from "@pinia/colada";
+import type { CasePreview } from "@repo/shared/game/public";
+import type { PlayerState } from "@repo/shared/game/state";
 import type { CaseMeta } from "@repo/shared/schemas/case.schema";
 import { api } from "@/lib/http";
 
@@ -16,3 +18,28 @@ export const usePlayableCasesQuery = defineQuery(() =>
 		query: () => api<PlayableCase[]>("/cases/playable"),
 	}),
 );
+
+export const useCaseBySlugQuery = (slug: string) =>
+	defineQuery(() =>
+		useQuery({
+			key: ["cases", slug],
+			query: () => api<CasePreview>(`/cases/${slug}`),
+		}),
+	)();
+
+export const useCaseProgressQuery = (slug: string) =>
+	defineQuery(() =>
+		useQuery({
+			key: ["cases", slug, "progress"],
+			query: () => api<{ state: PlayerState }>(`/cases/${slug}/progress`),
+		}),
+	)();
+
+export const useSaveProgressMutation = (slug: string) =>
+	useMutation({
+		mutation: (state: PlayerState) =>
+			api<{ state: PlayerState }>(`/cases/${slug}/progress`, {
+				method: "PUT",
+				body: state,
+			}),
+	});

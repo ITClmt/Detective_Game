@@ -204,3 +204,44 @@ export function markNodeSeen(
 	pushUnique(next.seenDialogueNodes, dialogueNodeKey(characterId, nodeId));
 	return next;
 }
+
+/**
+ * Une scène sans unlockWhen est disponible dès l'acceptation de l'enquête.
+ * Sinon, on consulte le cache `unlockedScenes` — jamais evaluateCondition en
+ * direct ici, cf. le commentaire sur PlayerState.unlockedScenes : une scène
+ * reste ouverte même si sa condition cesse d'être vraie.
+ */
+export function isSceneUnlocked(scene: Scene, state: PlayerState): boolean {
+	if (scene.unlockWhen === undefined) return true;
+	return state.unlockedScenes.includes(scene.id);
+}
+
+/**
+ * Réévalue unlockWhen de chaque scène contre l'état courant et ajoute au
+ * cache celles qui viennent de se qualifier. À appeler juste après
+ * applyEffects() : l'état vient de changer, de nouvelles scènes ont pu se
+ * débloquer. Ne retire jamais rien du cache (cliquet, pas un miroir live).
+ */
+export function refreshUnlockedScenes(
+	scenes: readonly Scene[],
+	state: PlayerState,
+): { state: PlayerState; newlyUnlocked: Scene[] } {
+	const newlyUnlocked = scenes.filter(
+		(scene) =>
+			scene.unlockWhen !== undefined &&
+			!state.unlockedScenes.includes(scene.id) &&
+			evaluateCondition(scene.unlockWhen, state),
+	);
+
+	if (newlyUnlocked.length === 0) return { state, newlyUnlocked };
+
+	const next: PlayerState = {
+		...state,
+		unlockedScenes: [
+			...state.unlockedScenes,
+			...newlyUnlocked.map((s) => s.id),
+		],
+	};
+
+	return { state: next, newlyUnlocked };
+}
