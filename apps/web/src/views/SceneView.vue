@@ -58,14 +58,9 @@ const background = computed(() => {
 	return resolveBackground(scene.value, state.value);
 });
 
-function handleHotspotClick(hotspot: Hotspot) {
-	if (!state.value || !caseFile.value) return;
-	if (activeDialogue.value || examineText.value) return;
+function commitState(next: PlayerState) {
+	if (!caseFile.value) return;
 
-	const branch = pickFirstMatch(hotspot.branches, state.value);
-	if (!branch) return;
-
-	const next: PlayerState = applyEffects(state.value, branch.effects);
 	const { state: refreshed } = refreshUnlockedScenes(
 		caseFile.value.content.scenes,
 		next,
@@ -73,11 +68,27 @@ function handleHotspotClick(hotspot: Hotspot) {
 
 	state.value = refreshed;
 	saveProgress(refreshed);
+}
+
+function handleHotspotClick(hotspot: Hotspot) {
+	if (!state.value || !caseFile.value) return;
+	if (activeDialogue.value || examineText.value) return;
+
+	const branch = pickFirstMatch(hotspot.branches, state.value);
+	if (!branch) return;
+
+	commitState(applyEffects(state.value, branch.effects));
+
 	for (const effect of branch.effects) {
 		if ("showText" in effect) examineText.value = effect.showText;
 		if ("startDialogue" in effect)
 			activeDialogueId.value = effect.startDialogue;
 	}
+}
+
+function handleDialogueClose(finalState: PlayerState) {
+	activeDialogueId.value = null;
+	commitState(finalState);
 }
 </script>
 
@@ -105,6 +116,7 @@ function handleHotspotClick(hotspot: Hotspot) {
 				:key="hotspot.id"
 				:label="hotspot.label"
 				:area="hotspot.area"
+				hover
 				@click="handleHotspotClick(hotspot)"
 			/>
 
@@ -119,7 +131,7 @@ function handleHotspotClick(hotspot: Hotspot) {
 				:dialogue="activeDialogue"
 				:state="state"
 				:character="activeCharacter"
-				@close="activeDialogueId = null"
+				@close="handleDialogueClose"
 			/>
 		</div>
 	</main>
