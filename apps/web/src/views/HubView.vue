@@ -42,6 +42,7 @@ function handleMailClick() {
 				:key="hotspot.label"
 				:label="hotspot.label"
 				:area="hotspot.area"
+				:hover="false"
 				@click="handleMailClick"
 			/>
 		</div>

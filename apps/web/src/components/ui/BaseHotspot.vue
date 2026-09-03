@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import type { HotspotArea } from "@repo/shared/schemas/case.schema";
 
-defineProps<{
+const {
+	label,
+	area,
+	hover = true,
+} = defineProps<{
 	label: string;
 	area: HotspotArea;
+	hover?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -24,21 +29,26 @@ const emit = defineEmits<{
 		<button
 			type="button"
 			:aria-label="label"
-			class="absolute inset-0 cursor-pointer bg-[radial-gradient(circle,var(--color-accent-glow)_0%,transparent_60%)] opacity-0 transition-opacity duration-300 ease-out hover:opacity-70"
+			class="absolute inset-0 cursor-pointer bg-[radial-gradient(circle,var(--color-accent-glow)_0%,transparent_60%)]"
+			:class="hover ? 'opacity-0 transition-opacity duration-300 ease-out hover:opacity-70' : 'opacity-100'"
 			@click="emit('click')"
 		></button>
 
 		<span
-			class="pointer-events-none absolute top-0 left-0 h-3.5 w-3.5 -translate-x-1 -translate-y-1 border-t-2 border-l-2 border-accent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+			class="pointer-events-none absolute top-0 left-0 h-3.5 w-3.5 -translate-x-1 -translate-y-1 border-t-2 border-l-2 border-accent opacity-0 transition-all duration-300 ease-out"
+			:class="hover ? 'group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100' : 'group-hover:translate-x-0 group-hover:translate-y-0 opacity-100'"
 		></span>
 		<span
-			class="pointer-events-none absolute top-0 right-0 h-3.5 w-3.5 translate-x-1 -translate-y-1 border-t-2 border-r-2 border-accent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+			class="pointer-events-none absolute top-0 right-0 h-3.5 w-3.5 translate-x-1 -translate-y-1 border-t-2 border-r-2 border-accent opacity-0 transition-all duration-300 ease-out"
+			:class="hover ? 'group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100' : 'group-hover:translate-x-0 group-hover:translate-y-0 opacity-100'"
 		></span>
 		<span
-			class="pointer-events-none absolute bottom-0 left-0 h-3.5 w-3.5 -translate-x-1 translate-y-1 border-b-2 border-l-2 border-accent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+			class="pointer-events-none absolute bottom-0 left-0 h-3.5 w-3.5 -translate-x-1 translate-y-1 border-b-2 border-l-2 border-accent opacity-0 transition-all duration-300 ease-out"
+			:class="hover ? 'group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100' : 'group-hover:translate-x-0 group-hover:translate-y-0 opacity-100'"
 		></span>
 		<span
-			class="pointer-events-none absolute right-0 bottom-0 h-3.5 w-3.5 translate-x-1 translate-y-1 border-r-2 border-b-2 border-accent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+			class="pointer-events-none absolute right-0 bottom-0 h-3.5 w-3.5 translate-x-1 translate-y-1 border-r-2 border-b-2 border-accent opacity-0 transition-all duration-300 ease-out"
+			:class="hover ? 'group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100' : 'group-hover:translate-x-0 group-hover:translate-y-0 opacity-100'"
 		></span>
 
 		<span
