@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Hotspot } from "@repo/shared";
+import type { Effect, Hotspot } from "@repo/shared";
 import {
 	applyEffects,
 	pickFirstMatch,
@@ -7,10 +7,12 @@ import {
 	resolveBackground,
 } from "@repo/shared/game/engine";
 import type { PlayerState } from "@repo/shared/game/state";
+import type { Interaction } from "@repo/shared/schemas/effect.schema";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import DialogueOverlay from "@/components/scene/DialogueOverlay.vue";
 import ExamineOverlay from "@/components/scene/ExamineOverlay.vue";
+import InteractionOverlay from "@/components/scene/InteractionOverlay.vue";
 import BaseHotspot from "@/components/ui/BaseHotspot.vue";
 import {
 	useCaseBySlugQuery,
@@ -29,6 +31,7 @@ const { mutate: saveProgress } = useSaveProgressMutation(slug);
 const state = ref<PlayerState>();
 const examineText = ref<string | null>(null);
 const activeDialogueId = ref<string | null>(null);
+const activeInteraction = ref<Interaction | null>(null);
 
 const activeDialogue = computed(() =>
 	activeDialogueId.value
@@ -83,12 +86,28 @@ function handleHotspotClick(hotspot: Hotspot) {
 		if ("showText" in effect) examineText.value = effect.showText;
 		if ("startDialogue" in effect)
 			activeDialogueId.value = effect.startDialogue;
+		if ("interaction" in effect) activeInteraction.value = effect.interaction;
 	}
 }
 
 function handleDialogueClose(finalState: PlayerState) {
 	activeDialogueId.value = null;
 	commitState(finalState);
+}
+
+function handleInteractionResolve(payload: {
+	success: boolean;
+	effects: Effect[];
+}) {
+	if (!state.value) return;
+
+	commitState(applyEffects(state.value, payload.effects));
+
+	for (const effect of payload.effects) {
+		if ("showText" in effect) examineText.value = effect.showText;
+	}
+
+	if (payload.success) activeInteraction.value = null;
 }
 </script>
 
@@ -118,6 +137,13 @@ function handleDialogueClose(finalState: PlayerState) {
 				:area="hotspot.area"
 				hover
 				@click="handleHotspotClick(hotspot)"
+			/>
+
+			<InteractionOverlay
+				v-if="activeInteraction"
+				:interaction="activeInteraction"
+				@resolve="handleInteractionResolve"
+				@cancel="activeInteraction = null"
 			/>
 
 			<ExamineOverlay
