@@ -156,11 +156,22 @@ const { debugMode } = useHotspotDebug();
 			v-else
 			class="relative overflow-hidden border border-border bg-surface-raised shadow-frame"
 		>
-			<img
-				:src="background"
-				:alt="scene.name"
-				class="block h-auto w-auto max-h-[calc(100dvh-2rem)] max-w-[calc(100dvw-5rem)] object-contain"
+			<Transition
+				mode="out-in"
+				enter-active-class="transition-opacity duration-500 ease-out"
+				enter-from-class="opacity-0"
+				enter-to-class="opacity-100"
+				leave-active-class="transition-opacity duration-500 ease-in"
+				leave-from-class="opacity-100"
+				leave-to-class="opacity-0"
 			>
+				<img
+					:key="background"
+					:src="background"
+					:alt="scene.name"
+					class="block h-auto w-auto max-h-[calc(100dvh-2rem)] max-w-[calc(100dvw-5rem)] object-contain"
+				>
+			</Transition>
 
 			<BaseHotspot
 				v-for="hotspot in scene.hotspots"

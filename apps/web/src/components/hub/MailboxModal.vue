@@ -127,7 +127,7 @@ onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 										</p>
 										<span
 											v-if="mail.started"
-											class="shrink-0 font-mono text-micro tracking-mono text-neutral-400"
+											class="shrink-0 font-mono text-micro tracking-mono text-lime-600"
 										>
 											EN COURS
 										</span>
