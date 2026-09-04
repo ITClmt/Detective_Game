@@ -165,6 +165,7 @@ export const caseItemSchema = z.strictObject({
 	id: z.string().min(1),
 	label: z.string().min(1),
 	image: z.url(),
+	description: z.string().min(1),
 });
 export type CaseItem = z.infer<typeof caseItemSchema>;
 

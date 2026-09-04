@@ -14,6 +14,7 @@ import { useRoute } from "vue-router";
 import DialogueOverlay from "@/components/scene/DialogueOverlay.vue";
 import ExamineOverlay from "@/components/scene/ExamineOverlay.vue";
 import InteractionOverlay from "@/components/scene/InteractionOverlay.vue";
+import InventoryModal from "@/components/scene/InventoryModal.vue";
 import SceneMap from "@/components/scene/SceneMap.vue";
 import BaseHotspot from "@/components/ui/BaseHotspot.vue";
 import HotspotDebugOverlay from "@/components/ui/HotspotDebugOverlay.vue";
@@ -73,6 +74,14 @@ const unlockedScenes = computed(() => {
 	);
 });
 
+const ownedItems = computed(() => {
+	if (!caseFile.value || !state.value) return [];
+	const currentState = state.value;
+	return caseFile.value.content.items.filter((item) =>
+		currentState.inventory.includes(item.id),
+	);
+});
+
 function commitState(next: PlayerState) {
 	if (!caseFile.value) return;
 
@@ -123,6 +132,7 @@ function handleInteractionResolve(payload: {
 }
 
 const showMap = ref(false);
+const showInventory = ref(false);
 
 function handleSceneSelect(sceneId: string) {
 	if (!state.value) return;
@@ -190,6 +200,13 @@ const { debugMode } = useHotspotDebug();
 				>
 					CARTE
 				</button>
+				<button
+					type="button"
+					class="cursor-pointer border border-accent bg-surface-raised px-3 py-2 font-mono text-label tracking-mono-wide text-accent transition-colors duration-150 hover:bg-accent hover:text-accent-contrast"
+					@click="showInventory = true"
+				>
+					INVENTAIRE
+				</button>
 			</div>
 
 			<SceneMap
@@ -198,6 +215,12 @@ const { debugMode } = useHotspotDebug();
 				:current-scene-id="state.currentSceneId"
 				@select="handleSceneSelect"
 				@close="showMap = false"
+			/>
+
+			<InventoryModal
+				v-if="showInventory"
+				:items="ownedItems"
+				@close="showInventory = false"
 			/>
 
 			<div
