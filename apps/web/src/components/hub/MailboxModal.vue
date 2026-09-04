@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import ResolutionModal from "@/components/hub/ResolutionModal.vue";
 import { usePlayableCasesQuery } from "@/queries/cases.queries";
 
 const router = useRouter();
@@ -27,6 +28,12 @@ function close() {
 function openCase(slug: string) {
 	close();
 	router.push({ name: "case", params: { slug } });
+}
+
+const activeResolutionSlug = ref<string | null>(null);
+
+function openResolution(slug: string) {
+	activeResolutionSlug.value = slug;
 }
 
 // Le clic sur le fond fermerait la modale sans équivalent clavier (règle
@@ -90,10 +97,14 @@ onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 					</p>
 
 					<ul v-else class="divide-y divide-border-subtle">
-						<li v-for="mail in mails" :key="mail.slug">
+						<li
+							v-for="mail in mails"
+							:key="mail.slug"
+							class="flex items-stretch gap-2 px-4 py-3.5"
+						>
 							<button
 								type="button"
-								class="flex w-full cursor-pointer gap-3.5 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-surface-inset"
+								class="flex flex-1 cursor-pointer gap-3.5 text-left transition-colors duration-150 hover:bg-surface-inset"
 								@click="openCase(mail.slug)"
 							>
 								<img
@@ -119,12 +130,27 @@ onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 									</p>
 								</div>
 							</button>
+
+							<button
+								v-if="mail.started"
+								type="button"
+								class="shrink-0 cursor-pointer self-center border border-accent px-3 py-2 font-mono text-label tracking-mono-wide text-accent transition-colors duration-150 hover:bg-accent hover:text-accent-contrast"
+								@click="openResolution(mail.slug)"
+							>
+								RÉPONDRE
+							</button>
 						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 	</Transition>
+
+	<ResolutionModal
+		v-if="activeResolutionSlug"
+		:slug="activeResolutionSlug"
+		@close="activeResolutionSlug = null"
+	/>
 </template>
 
 <style scoped>

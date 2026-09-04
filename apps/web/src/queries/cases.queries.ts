@@ -1,7 +1,13 @@
-import { defineQuery, useMutation, useQuery } from "@pinia/colada";
+import {
+	defineQuery,
+	useMutation,
+	useQuery,
+	useQueryCache,
+} from "@pinia/colada";
+import type { ResolutionAnswers } from "@repo/shared";
 import type { CasePreview } from "@repo/shared/game/public";
 import type { PlayerState } from "@repo/shared/game/state";
-import type { CaseMeta } from "@repo/shared/schemas/case.schema";
+import type { CaseMeta, Ending } from "@repo/shared/schemas/case.schema";
 import { api } from "@/lib/http";
 
 /** Entrée de `GET /cases/playable` : métadonnées d'enquête + progression du joueur. */
@@ -43,3 +49,18 @@ export const useSaveProgressMutation = (slug: string) =>
 				body: state,
 			}),
 	});
+
+export const useSolveCaseMutation = (slug: string) => {
+	const queryCache = useQueryCache();
+
+	return useMutation({
+		mutation: (answers: ResolutionAnswers) =>
+			api<{ score: number; ending: Ending }>(`/cases/${slug}/solve`, {
+				method: "POST",
+				body: answers,
+			}),
+		onSuccess: () => {
+			queryCache.invalidateQueries({ key: ["cases", "playable"] });
+		},
+	});
+};
