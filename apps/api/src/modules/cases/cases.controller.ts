@@ -59,7 +59,15 @@ const getPlayableCases = factory.createHandlers(requireAuth, async (c) => {
 	return c.json(cases);
 });
 
+const getSolvedCases = factory.createHandlers(requireAuth, async (c) => {
+	const user = c.get("user");
+	const cases = await casesService.getSolvedCases(user);
+
+	return c.json(cases);
+});
+
 export default {
+	getSolvedCases,
 	getBySlug,
 	getProgress,
 	saveProgress,

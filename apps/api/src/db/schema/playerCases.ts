@@ -1,3 +1,4 @@
+import type { Ending } from "@repo/shared";
 import type { PlayerState } from "@repo/shared/game/state";
 import { jsonb, pgTable, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 import { casesTable } from "./cases";
@@ -25,6 +26,7 @@ export const playerCasesTable = pgTable(
 			.references(() => casesTable.id, { onDelete: "cascade" }),
 		state: jsonb().$type<PlayerState>().notNull(),
 		solved_at: timestamp(),
+		solved_ending: jsonb().$type<Ending>(),
 		updated_at: timestamp(),
 		created_at: timestamp().defaultNow().notNull(),
 	},

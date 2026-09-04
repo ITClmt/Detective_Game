@@ -5,6 +5,7 @@ import casesController from "./cases.controller";
 const casesRoutes = new Hono<AuthEnv>();
 
 casesRoutes.get("/playable", ...casesController.getPlayableCases);
+casesRoutes.get("/solved", ...casesController.getSolvedCases);
 casesRoutes.get("/:slug", ...casesController.getBySlug);
 casesRoutes.get("/:slug/progress", ...casesController.getProgress);
 casesRoutes.put("/:slug/progress", ...casesController.saveProgress);

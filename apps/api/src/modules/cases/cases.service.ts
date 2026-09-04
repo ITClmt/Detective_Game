@@ -1,121 +1,130 @@
 import {
-  createPlayerState,
-  type PlayerState,
-  type PublicUser,
-  pickEnding,
-  playerStateSchema,
-  type ResolutionAnswers,
+	createPlayerState,
+	type PlayerState,
+	type PublicUser,
+	pickEnding,
+	playerStateSchema,
+	type ResolutionAnswers,
 } from "@repo/shared";
 import { stripSolution } from "@repo/shared/game/public";
 import { notFound } from "../../lib/errors";
 import casesRepository from "./cases.repository";
 
 const casesService = {
-  getBySlug: async (slug: string) => {
-    const caseRow = await casesRepository.findBySlug(slug);
+	getBySlug: async (slug: string) => {
+		const caseRow = await casesRepository.findBySlug(slug);
 
-    if (!caseRow) {
-      throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
-    }
+		if (!caseRow) {
+			throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
+		}
 
-    return stripSolution(caseRow.content);
-  },
+		return stripSolution(caseRow.content);
+	},
 
-  solve: async (user: PublicUser, slug: string, answers: ResolutionAnswers) => {
-    const caseRow = await casesRepository.findBySlug(slug);
+	getSolvedCases: async (user: PublicUser) => {
+		const caseRows = await casesRepository.findSolvedCases(user.id);
 
-    if (!caseRow) {
-      throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
-    }
+		return caseRows.map(({ cases, player_cases }) => ({
+			...cases.content.case,
+			ending: player_cases.solved_ending,
+		}));
+	},
 
-    const progress = await casesRepository.findPlayerCase(user.id, caseRow.id);
+	solve: async (user: PublicUser, slug: string, answers: ResolutionAnswers) => {
+		const caseRow = await casesRepository.findBySlug(slug);
 
-    if (!progress) {
-      throw notFound(
-        "PROGRESS_NOT_FOUND",
-        "Aucune partie en cours sur cette enquête",
-      );
-    }
+		if (!caseRow) {
+			throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
+		}
 
-    const result = pickEnding(caseRow.content.solution, answers);
+		const progress = await casesRepository.findPlayerCase(user.id, caseRow.id);
 
-    // Pas une AppError : c'est le contenu de l'enquête qui est incomplet
-    // (aucune fin ne couvre ce score), pas la requête du client. Le handler
-    // global le loggera et répondra 500.
-    if (!result) {
-      throw new Error(`Aucune fin ne couvre le score obtenu (${slug})`);
-    }
+		if (!progress) {
+			throw notFound(
+				"PROGRESS_NOT_FOUND",
+				"Aucune partie en cours sur cette enquête",
+			);
+		}
 
-    await casesRepository.markSolved(user.id, caseRow.id);
+		const result = pickEnding(caseRow.content.solution, answers);
 
-    return { score: result.score, ending: result.ending };
-  },
+		// Pas une AppError : c'est le contenu de l'enquête qui est incomplet
+		// (aucune fin ne couvre ce score), pas la requête du client. Le handler
+		// global le loggera et répondra 500.
+		if (!result) {
+			throw new Error(`Aucune fin ne couvre le score obtenu (${slug})`);
+		}
 
-  getProgress: async (user: PublicUser, slug: string) => {
-    const caseRow = await casesRepository.findBySlug(slug);
+		await casesRepository.markSolved(user.id, caseRow.id, result.ending);
 
-    if (!caseRow) {
-      throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
-    }
+		return { score: result.score, ending: result.ending };
+	},
 
-    const existing = await casesRepository.findPlayerCase(user.id, caseRow.id);
+	getProgress: async (user: PublicUser, slug: string) => {
+		const caseRow = await casesRepository.findBySlug(slug);
 
-    // Revalidé à la relecture : une sauvegarde écrite avant une évolution du
-    // format lève ici une erreur nette, au lieu de casser le front sur un
-    // champ absent.
-    if (existing) return playerStateSchema.parse(existing.state);
+		if (!caseRow) {
+			throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
+		}
 
-    const initialState = createPlayerState(caseRow.content.content.startScene);
-    const created = await casesRepository.upsertPlayerCase(
-      user.id,
-      caseRow.id,
-      initialState,
-    );
+		const existing = await casesRepository.findPlayerCase(user.id, caseRow.id);
 
-    return created.state;
-  },
+		// Revalidé à la relecture : une sauvegarde écrite avant une évolution du
+		// format lève ici une erreur nette, au lieu de casser le front sur un
+		// champ absent.
+		if (existing) return playerStateSchema.parse(existing.state);
 
-  saveProgress: async (user: PublicUser, slug: string, state: PlayerState) => {
-    const caseRow = await casesRepository.findBySlug(slug);
+		const initialState = createPlayerState(caseRow.content.content.startScene);
+		const created = await casesRepository.upsertPlayerCase(
+			user.id,
+			caseRow.id,
+			initialState,
+		);
 
-    if (!caseRow) {
-      throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
-    }
+		return created.state;
+	},
 
-    const saved = await casesRepository.upsertPlayerCase(
-      user.id,
-      caseRow.id,
-      state,
-    );
+	saveProgress: async (user: PublicUser, slug: string, state: PlayerState) => {
+		const caseRow = await casesRepository.findBySlug(slug);
 
-    return saved.state;
-  },
+		if (!caseRow) {
+			throw notFound("CASE_NOT_FOUND", "Enquête introuvable");
+		}
 
-  getPlayableCases: async (user: PublicUser) => {
-    const [cases, playerCases] = await Promise.all([
-      casesRepository.findPublishedCases(),
-      casesRepository.findPlayerCases(user.id),
-    ]);
+		const saved = await casesRepository.upsertPlayerCase(
+			user.id,
+			caseRow.id,
+			state,
+		);
 
-    // Un lookup O(1) par case_id, plutôt que .find() dans le tableau à chaque case.
-    const progressByCaseId = new Map(playerCases.map((pc) => [pc.case_id, pc]));
+		return saved.state;
+	},
 
-    return cases
-      .filter((caseRow) => {
-        const requirement = caseRow.unlock_requirement;
+	getPlayableCases: async (user: PublicUser) => {
+		const [cases, playerCases] = await Promise.all([
+			casesRepository.findPublishedCases(),
+			casesRepository.findPlayerCases(user.id),
+		]);
 
-        const unlocked =
-          !requirement || !!progressByCaseId.get(requirement)?.solved_at;
+		// Un lookup O(1) par case_id, plutôt que .find() dans le tableau à chaque case.
+		const progressByCaseId = new Map(playerCases.map((pc) => [pc.case_id, pc]));
 
-        const notSolved = !progressByCaseId.get(caseRow.id)?.solved_at;
+		return cases
+			.filter((caseRow) => {
+				const requirement = caseRow.unlock_requirement;
 
-        return unlocked && notSolved;
-      })
-      .map((caseRow) => ({
-        ...caseRow.content.case,
-        started: progressByCaseId.has(caseRow.id),
-      }));
-  },
+				const unlocked =
+					!requirement || !!progressByCaseId.get(requirement)?.solved_at;
+
+				const notSolved = !progressByCaseId.get(caseRow.id)?.solved_at;
+
+				return unlocked && notSolved;
+			})
+			.map((caseRow) => ({
+				...caseRow.content.case,
+				started: progressByCaseId.has(caseRow.id),
+			}));
+	},
 };
 
 export default casesService;

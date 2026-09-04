@@ -1,0 +1,1 @@
+ALTER TABLE "player_cases" ADD COLUMN "solved_ending" jsonb;

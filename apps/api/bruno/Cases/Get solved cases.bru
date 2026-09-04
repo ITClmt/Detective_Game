@@ -1,0 +1,41 @@
+meta {
+  name: Get solved cases
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/cases/solved
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{accessToken}}
+}
+
+tests {
+  test("répond 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("renvoie un tableau", function () {
+    expect(res.getBody()).to.be.an("array");
+  });
+
+  test("contient l'enquête résolue, avec la fin du premier succès", function () {
+    // markSolved n'écrit qu'une fois (WHERE solved_at IS NULL) : les solves
+    // suivants (score 2/3) ne doivent pas avoir bougé l'ending enregistré,
+    // qui doit rester celui du tout premier solve réussi (score 3/3).
+    const entry = res.getBody().find((c) => c.slug === "chute-nicolas-verdier");
+    expect(entry).to.exist;
+    expect(entry.ending.score).to.equal(3);
+    expect(entry.ending.title).to.equal("Dossier clos");
+  });
+
+  test("ne renvoie que les métadonnées, pas le contenu jouable", function () {
+    const entry = res.getBody().find((c) => c.slug === "chute-nicolas-verdier");
+    expect(entry).to.not.have.property("content");
+    expect(entry).to.not.have.property("solution");
+  });
+}
