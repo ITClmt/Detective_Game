@@ -14,6 +14,8 @@ import DialogueOverlay from "@/components/scene/DialogueOverlay.vue";
 import ExamineOverlay from "@/components/scene/ExamineOverlay.vue";
 import InteractionOverlay from "@/components/scene/InteractionOverlay.vue";
 import BaseHotspot from "@/components/ui/BaseHotspot.vue";
+import HotspotDebugOverlay from "@/components/ui/HotspotDebugOverlay.vue";
+import { useHotspotDebug } from "@/composables/useHotspotDebug";
 import {
 	useCaseBySlugQuery,
 	useCaseProgressQuery,
@@ -109,6 +111,8 @@ function handleInteractionResolve(payload: {
 
 	if (payload.success) activeInteraction.value = null;
 }
+
+const { debugMode } = useHotspotDebug();
 </script>
 
 <template>
@@ -159,6 +163,14 @@ function handleInteractionResolve(payload: {
 				:character="activeCharacter"
 				@close="handleDialogueClose"
 			/>
+
+			<div
+				class="pointer-events-none absolute right-3 bottom-3 z-10 font-mono text-micro text-content-ghost"
+			>
+				D = debug hotspots ({{ debugMode ? "ON" : "off" }})
+			</div>
+
+			<HotspotDebugOverlay v-if="debugMode" />
 		</div>
 	</main>
 </template>

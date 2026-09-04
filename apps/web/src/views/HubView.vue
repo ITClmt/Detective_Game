@@ -2,7 +2,10 @@
 import { ref } from "vue";
 import MailboxModal from "@/components/hub/MailboxModal.vue";
 import BaseHotspot from "@/components/ui/BaseHotspot.vue";
+import HotspotDebugOverlay from "@/components/ui/HotspotDebugOverlay.vue";
+import { useHotspotDebug } from "@/composables/useHotspotDebug";
 
+const { debugMode } = useHotspotDebug();
 const mailBox = ref(false);
 
 const hub = ref({
@@ -10,7 +13,7 @@ const hub = ref({
 	description: "Garage",
 	hotspots: [
 		{
-			label: "e-Mail",
+			label: "E-Mail",
 			area: {
 				x: 72.03,
 				y: 44.22,
@@ -45,6 +48,14 @@ function handleMailClick() {
 				:hover="false"
 				@click="handleMailClick"
 			/>
+
+			<div
+				class="pointer-events-none absolute right-3 bottom-3 z-10 font-mono text-micro text-content-ghost"
+			>
+				D = debug hotspots ({{ debugMode ? "ON" : "off" }})
+			</div>
+
+			<HotspotDebugOverlay v-if="debugMode" />
 		</div>
 
 		<MailboxModal v-model:open="mailBox" />
