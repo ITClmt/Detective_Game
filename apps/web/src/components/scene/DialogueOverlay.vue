@@ -86,8 +86,10 @@ onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 				</button>
 			</div>
 
-			<p class="whitespace-pre-line text-body text-content">
-				&gt; {{ node?.text }}
+			<p class="whitespace-pre-line text-body text-content leading-4">
+				&gt; <br>
+				{{ node?.text }} <br>
+				&gt;
 			</p>
 
 			<div
