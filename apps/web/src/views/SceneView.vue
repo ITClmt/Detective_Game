@@ -14,7 +14,7 @@ import { useRoute } from "vue-router";
 import DialogueOverlay from "@/components/scene/DialogueOverlay.vue";
 import ExamineOverlay from "@/components/scene/ExamineOverlay.vue";
 import InteractionOverlay from "@/components/scene/InteractionOverlay.vue";
-import SceneModal from "@/components/scene/SceneModal.vue";
+import SceneMap from "@/components/scene/SceneMap.vue";
 import BaseHotspot from "@/components/ui/BaseHotspot.vue";
 import HotspotDebugOverlay from "@/components/ui/HotspotDebugOverlay.vue";
 import { useHotspotDebug } from "@/composables/useHotspotDebug";
@@ -192,39 +192,13 @@ const { debugMode } = useHotspotDebug();
 				</button>
 			</div>
 
-			<SceneModal v-if="showMap" label="CARTE" @close="showMap = false">
-				<ol class="relative flex flex-col gap-6 pl-6">
-					<div class="absolute top-2 bottom-2 left-1.75 w-px bg-border"></div>
-
-					<li
-						v-for="candidate in unlockedScenes"
-						:key="candidate.id"
-						class="relative"
-					>
-						<span
-							class="absolute top-1 -left-6 h-3.5 w-3.5 rounded-full border-2 border-accent"
-							:class="candidate.id === state.currentSceneId ? 'bg-accent' : 'bg-surface'"
-						></span>
-
-						<button
-							type="button"
-							:disabled="candidate.id === state.currentSceneId"
-							class="w-full text-left disabled:cursor-not-allowed enabled:cursor-pointer"
-							@click="handleSceneSelect(candidate.id)"
-						>
-							<p
-								class="font-mono text-label tracking-mono-wide"
-								:class="candidate.id === state.currentSceneId ? 'text-accent' : 'text-content'"
-							>
-								{{ candidate.name }}
-							</p>
-							<p class="mt-1 text-body-sm text-content-lede">
-								{{ candidate.intro }}
-							</p>
-						</button>
-					</li>
-				</ol>
-			</SceneModal>
+			<SceneMap
+				v-if="showMap"
+				:scenes="unlockedScenes"
+				:current-scene-id="state.currentSceneId"
+				@select="handleSceneSelect"
+				@close="showMap = false"
+			/>
 
 			<div
 				class="pointer-events-none absolute right-3 bottom-3 z-10 font-mono text-micro text-content-ghost"
